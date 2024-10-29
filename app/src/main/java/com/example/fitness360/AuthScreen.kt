@@ -33,7 +33,7 @@ fun AuthScreen(navController: NavController) {
 
     Column(modifier = Modifier.fillMaxSize()) {
         Button(
-            onClick = {  navController.navigate("login") },
+            onClick = {  navController.navigate("register") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp),
@@ -46,7 +46,7 @@ fun AuthScreen(navController: NavController) {
         }
 
         Button(
-            onClick = { navController.navigate("register") },
+            onClick = { navController.navigate("login") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp),

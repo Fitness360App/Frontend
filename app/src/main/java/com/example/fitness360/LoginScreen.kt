@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +32,8 @@ import kotlin.io.path.moveTo
 
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
+import com.example.fitness360.components.CustomButton
+import com.example.fitness360.components.WaveBackground
 
 
 @Composable
@@ -39,36 +42,26 @@ fun LoginScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize() // Ocupa todo el tamaño de la pantalla
     ) {
+        WaveBackground(
+            modifier = Modifier,
+            height = 200.dp,
+            color = Color(0xFF0066A1) // Puedes personalizar el color
+        )
 
-        Canvas(modifier = Modifier.fillMaxWidth().height(200.dp)) {
-            val width = size.width
-            val height = size.height
-
-            val path = Path().apply {
-                moveTo(0f, height * 0.6f) // Empezamos un poco más abajo
-
-                // Creación de la ondulación que primero sube y luego baja
-                cubicTo(
-                    width * 0.4f, height * 0.2f, // Primer punto de control para subir
-                    width * 0.6f, height*1.3f, // Segundo punto de control para bajar
-                    width, height * 0.6f // Punto final de la ondulación
-                )
-
-                lineTo(width, 0f)
-                lineTo(0f, 0f)
-                close()
-            }
-            drawPath(path = path, color = Color(0xFF0066A1), style = Fill)
-        }
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally, // Centra el contenido horizontalmente
-            modifier = Modifier.width(300.dp) // Controla el ancho de la columna
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 250.dp, start = 24.dp, end = 24.dp)
         ) {
+
             Text(
                 text = "¡ Bienvenido/a !",
                 fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
+                fontSize = 40.sp,
+                modifier = Modifier
+                    .padding(bottom = 20.dp)
             )
 
             OutlinedTextField(
@@ -98,18 +91,12 @@ fun LoginScreen(navController: NavController) {
                 style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
             )
 
-            Button(
-                onClick = { /* Acción de inicio de sesión */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF0066A1) // Color azul
-                ),
-                shape = RoundedCornerShape(50) // Botón redondeado
-            ) {
-                Text("Iniciar Sesión", color = Color.White)
-            }
+            // Uso del botón personalizado
+            CustomButton(
+                text = "Iniciar Sesión",
+                onClick = { /* Acción de registro */ }
+            )
+
 
             Row(
                 modifier = Modifier

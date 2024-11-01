@@ -24,6 +24,7 @@ constraintlayout = "2.1.4"
 
 
 [libraries]
+androidx-compose-material-icons-extended = "androidx.compose.material:material-icons-extended:<version>"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }

@@ -68,7 +68,7 @@ fun HomeScreen(navController: NavController) {
 
         MultiLayerCircularIndicators(
             carbProgress = 0.5f,
-            proteinProgress = 0.9f,
+            proteinProgress = 0.2f,
             fatProgress = 0.3f
         )
 

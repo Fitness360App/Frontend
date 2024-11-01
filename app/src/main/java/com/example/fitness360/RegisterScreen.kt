@@ -67,6 +67,7 @@ fun RegisterScreen(navController: NavController) {
             RegistrationForm(navController) { showModal = true }
         } else {
             RegistrationSteps(
+                navController,
                 step,
                 animatedProgress,
                 totalSteps,
@@ -114,7 +115,7 @@ fun RegistrationForm(navController: NavController, onRegisterClick: () -> Unit) 
 }
 
 @Composable
-fun RegistrationSteps(step: Int, animatedProgress: Float, totalSteps: Int, onNext: () -> Unit, onPrevious: () -> Unit) {
+fun RegistrationSteps(navController: NavController, step: Int, animatedProgress: Float, totalSteps: Int, onNext: () -> Unit, onPrevious: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -134,7 +135,7 @@ fun RegistrationSteps(step: Int, animatedProgress: Float, totalSteps: Int, onNex
             0 -> StepPersonalInfo(onNext, onPrevious)
             1 -> StepWeightGoals(onNext, onPrevious)
             2 -> StepActivityInfo(onNext, onPrevious)
-            3 -> StepConfirmation(onPrevious)
+            3 -> StepConfirmation(navController, onPrevious)
         }
     }
 }
@@ -164,7 +165,7 @@ fun StepActivityInfo(onNext: () -> Unit, onPrevious: () -> Unit) {
 }
 
 @Composable
-fun StepConfirmation(onPrevious: () -> Unit) {
+fun StepConfirmation(navController: NavController, onPrevious: () -> Unit) {
     LocalImageExample()
     Box(
         modifier = Modifier
@@ -190,7 +191,7 @@ fun StepConfirmation(onPrevious: () -> Unit) {
 
             CustomButton(
                 text = "Finalizar",
-                onClick = {},
+                onClick = {navController.navigate("home")},
                 padding = PaddingValues(10.dp),
                 fontWeight = FontWeight.SemiBold,
                 width = 150.dp, // Anchura personalizada

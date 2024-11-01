@@ -22,9 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 
 @Composable
-fun BottomNavigationBar() {
+fun BottomNavigationBar(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -39,14 +40,14 @@ fun BottomNavigationBar() {
                 .fillMaxWidth()
                 .height(80.dp) // Ajusta la altura para hacer más grande la barra
         ) {
-            IconButton(onClick = { /* Acción del ícono */ }, modifier = Modifier.weight(1f)) {
+            IconButton(onClick = { navController.navigate("home") }, modifier = Modifier.weight(1f)) {
                 Icon(
                     imageVector = Icons.Default.Home,
                     contentDescription = "Inicio",
                     modifier = Modifier.size(36.dp) // Ajusta el tamaño del icono
                 )
             }
-            IconButton(onClick = { /* Acción del ícono */ }, modifier = Modifier.weight(1f)) {
+            IconButton(onClick = { navController.navigate("search")}, modifier = Modifier.weight(1f)) {
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = "Buscar",

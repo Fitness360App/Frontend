@@ -44,7 +44,7 @@ fun HomeScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 0.dp),
         horizontalAlignment = Alignment.Start
     ) {
         Column(
@@ -82,7 +82,7 @@ fun HomeScreen(navController: NavController) {
 
 
 
-        BottomNavigationBar()
+        BottomNavigationBar(navController)
     }
 }
 

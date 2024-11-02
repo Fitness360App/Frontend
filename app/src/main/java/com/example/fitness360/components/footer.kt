@@ -54,7 +54,7 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(36.dp) // Ajusta el tamaño del icono
                 )
             }
-            IconButton(onClick = { /* Acción del ícono de calculadora */ }, modifier = Modifier.weight(1f)) {
+            IconButton(onClick = { navController.navigate("calculators")}, modifier = Modifier.weight(1f)) {
                 Icon(
                     imageVector = Icons.Rounded.Calculate,
                     contentDescription = "Calculadora",

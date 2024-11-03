@@ -1,5 +1,6 @@
 package com.example.fitness360
 
+import AccountSettingsScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -39,6 +40,8 @@ fun MainScreen() {
         composable("search") { SearchFoodScreen(navController) }
         composable("calculators") { CalculatorsScreen(navController) }
         composable("meal") { MealScreen(navController) }
+        composable("settings") { SettingsScreen(navController) }
+        composable("AccountSettingsScreen") { AccountSettingsScreen(navController) }
     }
 }
 

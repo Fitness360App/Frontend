@@ -56,13 +56,13 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier.padding(start = 16.dp, bottom = 16.dp) // Ajuste para separar el título del contenido
             ) {
                 Text(
-                    text = "Hola",
+                    text = "HOLA",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
                 Text(
-                    text = "Aca",
+                    text = "ACA",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF0066A1)

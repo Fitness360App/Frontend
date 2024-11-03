@@ -55,27 +55,28 @@ fun MealScreen(navController: NavController) {
             .padding(start = 16.dp, top = 16.dp, end = 16.dp)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 56.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.Start
         ) {
-            Box(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.Start
             ) {
-                Column(modifier = Modifier.padding(bottom = 16.dp)) {
+                // Encabezado con padding superior ajustado
+                Column() {
                     Text(
                         text = "COMIDAS",
-                        fontSize = 24.sp,
+                        fontSize = 26.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = Color(0xFF333333)
                     )
                     Text(
                         text = "DIARIAS",
-                        fontSize = 20.sp,
+                        fontSize = 22.sp,
                         color = Color(0xFF007ACC),
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             }

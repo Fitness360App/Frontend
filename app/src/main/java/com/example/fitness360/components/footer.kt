@@ -68,7 +68,7 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(36.dp) // Ajusta el tamaño del icono
                 )
             }
-            IconButton(onClick = { /* Acción del ícono */ }, modifier = Modifier.weight(1f)) {
+            IconButton(onClick = { navController.navigate("settings") }, modifier = Modifier.weight(1f)) {
                 Icon(
                     imageVector = Icons.Default.Settings,
                     contentDescription = "Configuración",

@@ -38,6 +38,7 @@ fun MainScreen() {
         composable("home") { HomeScreen(navController) }
         composable("search") { SearchFoodScreen(navController) }
         composable("calculators") { CalculatorsScreen(navController) }
+        composable("meal") { MealScreen(navController) }
     }
 }
 

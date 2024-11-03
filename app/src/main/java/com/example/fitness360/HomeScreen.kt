@@ -41,50 +41,53 @@ import com.example.fitness360.components.BottomNavigationBar
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 0.dp),
-        horizontalAlignment = Alignment.Start
+            .padding(start = 16.dp, top = 16.dp, end = 16.dp) // Padding uniforme en todo el Box
     ) {
         Column(
-            modifier = Modifier.padding(start = 32.dp, top = 16.dp)
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.Start
         ) {
-            Text(
-                text = "Hola",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
+            // Encabezado con padding superior ajustado
+            Column(
+                modifier = Modifier.padding(start = 16.dp, bottom = 16.dp) // Ajuste para separar el título del contenido
+            ) {
+                Text(
+                    text = "Hola",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Text(
+                    text = "Aca",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF0066A1)
+                )
+            }
+
+            MultiLayerCircularIndicators(
+                carbProgress = 0.5f,
+                proteinProgress = 0.2f,
+                fatProgress = 0.3f,
+                kcalsProgress = 0.5f
             )
-            Spacer(modifier = Modifier.height(1.dp))
-            Text(
-                text = "Aca",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF0066A1)
-            )
+
+            Spacer(modifier = Modifier.height(24.dp)) // Espacio uniforme
+
+            ActivitySummary()
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        MultiLayerCircularIndicators(
-            carbProgress = 0.5f,
-            proteinProgress = 0.2f,
-            fatProgress = 0.3f,
-            kcalsProgress = 0.5f
+        // Barra de navegación en la parte inferior, fija
+        BottomNavigationBar(
+            navController = navController
         )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        ActivitySummary()
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-
-
-        BottomNavigationBar(navController)
     }
 }
+
 
 @Composable
 fun VerticalFillCircle(

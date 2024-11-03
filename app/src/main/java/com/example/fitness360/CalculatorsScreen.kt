@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -17,63 +18,60 @@ import com.example.fitness360.components.BottomNavigationBar
 
 @Composable
 fun CalculatorsScreen(navController: NavController) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
-            .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 0.dp),
-        horizontalAlignment = Alignment.Start
+            .padding(start = 16.dp, top = 16.dp, end = 16.dp) // Padding uniforme en todo el Box
     ) {
-        // Título principal
-        Box(
+        Column(
             modifier = Modifier
-                .padding(start = 24.dp)
-                .fillMaxWidth()
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.Start
         ) {
-            Column(horizontalAlignment = Alignment.Start) {
+            // Encabezado con padding superior ajustado
+            Column(modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)) {
                 Text(
                     text = "CALCULADORA",
-                    fontSize = 24.sp,
+                    fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = Color(0xFF333333)
                 )
                 Text(
                     text = "MACRONUTRIENTES",
-                    fontSize = 20.sp,
+                    fontSize = 22.sp,
                     color = Color(0xFF007ACC),
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.SemiBold
                 )
             }
+
+            InfoCard(
+                title = "Sus datos introducidos son",
+                items = listOf(
+                    "Altura" to "171 cm",
+                    "Peso" to "60 kg",
+                    "Edad" to "20 años",
+                    "Objetivo" to "Ganar Peso"
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp)) // Espacio uniforme
+
+            InfoCard(
+                title = "Sus macros son:",
+                items = listOf(
+                    "Kilocalorías" to "2767 kcals",
+                    "Proteínas" to "207 g",
+                    "Grasas" to "77 g",
+                    "Carbohidratos" to "311 g",
+                    "IMC" to "20.52"
+                )
+            )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Tarjeta de datos introducidos
-        InfoCard(
-            title = "Sus datos introducidos son",
-            items = listOf(
-                "Altura" to "171cm",
-                "Peso" to "60kg",
-                "Edad" to "20 años",
-                "Objetivo" to "Ganar Peso"
-            )
+        // Barra de navegación en la parte inferior, fija
+        BottomNavigationBar(
+            navController = navController
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Tarjeta de macronutrientes
-        InfoCard(
-            title = "Sus macros son:",
-            items = listOf(
-                "Kilocalorías" to "2767 kcals",
-                "Proteínas" to "207g",
-                "Grasas" to "77g",
-                "Carbohidratos" to "311g",
-                "IMC" to "20.52"
-            )
-        )
-
-        BottomNavigationBar(navController)
     }
 }
 
@@ -83,34 +81,31 @@ fun InfoCard(title: String, items: List<Pair<String, String>>) {
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent // Fondo transparente para aplicar el gradiente
-        )
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .shadow(8.dp, shape = RoundedCornerShape(12.dp)), // Sombra para profundidad
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Box(
             modifier = Modifier
                 .background(
                     brush = Brush.horizontalGradient(
-                        colors = listOf(Color(0xFF005A9E), Color(0xFF007ACC))
+                        colors = listOf(Color(0xFF007ACC), Color(0xFF005A9E))
                     ),
                     shape = RoundedCornerShape(12.dp)
                 )
                 .padding(16.dp)
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = title,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Excluir el último elemento si el número de elementos es impar
+                // Muestra los elementos en pares o centra el último si es impar
                 val itemsToDisplay = if (items.size % 2 != 0) items.dropLast(1) else items
 
                 itemsToDisplay.chunked(2).forEach { rowItems ->
@@ -132,7 +127,7 @@ fun InfoCard(title: String, items: List<Pair<String, String>>) {
                                 Text(
                                     text = value,
                                     fontSize = 14.sp,
-                                    color = Color.White.copy(alpha = 0.7f)
+                                    color = Color.White.copy(alpha = 0.8f)
                                 )
                             }
                         }
@@ -141,7 +136,7 @@ fun InfoCard(title: String, items: List<Pair<String, String>>) {
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                // Si hay un número impar de elementos, centra el último
+                // Si el número de elementos es impar, centra el último
                 if (items.size % 2 != 0) {
                     val lastItem = items.last()
                     Column(
@@ -157,7 +152,7 @@ fun InfoCard(title: String, items: List<Pair<String, String>>) {
                         Text(
                             text = lastItem.second,
                             fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.7f)
+                            color = Color.White.copy(alpha = 0.8f)
                         )
                     }
                 }
@@ -165,7 +160,3 @@ fun InfoCard(title: String, items: List<Pair<String, String>>) {
         }
     }
 }
-
-
-
-

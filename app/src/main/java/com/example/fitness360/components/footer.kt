@@ -38,7 +38,7 @@ fun BottomNavigationBar(navController: NavController) {
             contentColor = Color(0xFF0066A1),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp) // Ajusta la altura para hacer más grande la barra
+                .height(40.dp) // Ajusta la altura para hacer más grande la barra
         ) {
             IconButton(onClick = { navController.navigate("home") }, modifier = Modifier.weight(1f)) {
                 Icon(
@@ -61,7 +61,7 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(36.dp) // Ajusta el tamaño del icono
                 )
             }
-            IconButton(onClick = { /* Acción del ícono */ }, modifier = Modifier.weight(1f)) {
+            IconButton(onClick = { navController.navigate("meal") }, modifier = Modifier.weight(1f)) {
                 Icon(
                     imageVector = Icons.Default.Assignment,
                     contentDescription = "Listas",

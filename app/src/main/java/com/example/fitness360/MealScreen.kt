@@ -86,6 +86,7 @@ fun MealScreen(navController: NavController) {
                 item { MealList("Almuerzo", almuerzo) { selectedFood = it } }
                 item { MealList("Merienda", merienda) { selectedFood = it } }
                 item { MealList("Cena", cena) { selectedFood = it } }
+                item { Spacer(modifier = Modifier.height(56.dp)) } // Añadir un espacio al final
             }
         }
 
@@ -154,18 +155,27 @@ fun FoodItemRow(food: FoodItem, onClick: () -> Unit) {
     Card(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9F9)), // Fondo gris claro para las tarjetas
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9F9)),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .clickable { onClick() }
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
-            Column {
-                Text(text = food.name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = food.name,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
                 Text(
                     text = "Cantidad: ${food.quantity}g",
                     fontSize = 14.sp,
@@ -177,10 +187,21 @@ fun FoodItemRow(food: FoodItem, onClick: () -> Unit) {
                     color = Color.Gray
                 )
             }
-            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit", tint = Color(0xFF007ACC))
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Edit",
+                tint = Color(0xFF007ACC),
+                modifier = Modifier
+                    .size(24.dp)
+                    .align(Alignment.TopEnd)
+                    .padding(end = 4.dp, top = 4.dp) // Ajuste para separación de los bordes
+                    .clickable { onClick() }
+            )
         }
     }
 }
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

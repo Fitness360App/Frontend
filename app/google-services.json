@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "902794956175",
+    "project_id": "fitness360-cc4a2",
+    "storage_bucket": "fitness360-cc4a2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:902794956175:android:88ffcf26c417390a7c4ffa",
+        "android_client_info": {
+          "package_name": "com.example.fitness360"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "902794956175-9301mnhe9l4hmmfonjg62gm12ekomsut.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA64cuEnhs_KRTqqW-FS1LwfLO2mxSg_aY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "902794956175-9301mnhe9l4hmmfonjg62gm12ekomsut.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -35,9 +35,18 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import com.example.fitness360.components.CustomButton
 import com.example.fitness360.components.WaveBackground
 
+import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun LoginScreen(navController: NavController) {
+
+    val coroutineScope = rememberCoroutineScope()
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var loginStatus by remember { mutableStateOf("") }
+
     Box(
         modifier = Modifier
             .fillMaxSize() // Ocupa todo el tamaño de la pantalla
@@ -47,7 +56,6 @@ fun LoginScreen(navController: NavController) {
             height = 200.dp,
             color = Color(0xFF0066A1) // Puedes personalizar el color
         )
-
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally, // Centra el contenido horizontalmente
@@ -65,8 +73,8 @@ fun LoginScreen(navController: NavController) {
             )
 
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = email,
+                onValueChange = { email = it },
                 label = { Text("Usuario") },
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -74,13 +82,14 @@ fun LoginScreen(navController: NavController) {
             )
 
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = password,
+                onValueChange = { password = it },
                 label = { Text("Contraseña") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp),
-                shape = RoundedCornerShape(30.dp)
+                shape = RoundedCornerShape(30.dp),
+                visualTransformation = PasswordVisualTransformation()
             )
 
             Text(
@@ -94,9 +103,10 @@ fun LoginScreen(navController: NavController) {
             // Uso del botón personalizado
             CustomButton(
                 text = "Iniciar Sesión",
-                onClick = { /* Acción de registro */ }
-            )
+                onClick = {
 
+                }
+            )
 
             Row(
                 modifier = Modifier
@@ -114,6 +124,13 @@ fun LoginScreen(navController: NavController) {
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
+
+            // Mostrar el estado del login
+            Text(
+                text = loginStatus,
+                modifier = Modifier.padding(top = 16.dp),
+                color = Color.Red
+            )
         }
     }
 }

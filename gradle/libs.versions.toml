@@ -21,9 +21,17 @@ ui = "1.7.4"
 volley = "1.2.1"
 protoliteWellKnownTypes = "18.0.0"
 constraintlayout = "2.1.4"
+firebase-bom = "31.0.2" # versión de Firebase BOM
+firebase-auth = { ref = "firebase-bom" }
+firebaseAuthKtx = "23.1.0" # usa la misma versión para BOM
+
 
 
 [libraries]
+
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
+firebase-auth = { module = "com.google.firebase:firebase-auth-ktx" }
+
 androidx-compose-material-icons-extended = "androidx.compose.material:material-icons-extended:<version>"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
@@ -52,8 +60,10 @@ ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 protolite-well-known-types = { group = "com.google.firebase", name = "protolite-well-known-types", version.ref = "protoliteWellKnownTypes" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version = "4.3.13" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

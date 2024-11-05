@@ -16,14 +16,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fitness360.ui.theme.Fitness360Theme
-import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Inicializa Firebase
-        FirebaseApp.initializeApp(this)
 
         setContent {
             Fitness360Theme {

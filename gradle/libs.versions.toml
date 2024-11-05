@@ -27,6 +27,7 @@ firebaseAuthKtx = "23.1.0" # usa la misma versión para BOM
 
 
 
+
 [libraries]
 
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
@@ -60,7 +61,9 @@ ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 protolite-well-known-types = { group = "com.google.firebase", name = "protolite-well-known-types", version.ref = "protoliteWellKnownTypes" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+
+retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

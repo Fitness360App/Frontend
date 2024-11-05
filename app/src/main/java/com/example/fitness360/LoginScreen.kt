@@ -1,20 +1,20 @@
 package com.example.fitness360
 
-import androidx.compose.foundation.Canvas
+
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -26,26 +26,49 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import kotlin.io.path.Path
-import kotlin.io.path.moveTo
 
 
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Fill
+
+
 import com.example.fitness360.components.CustomButton
 import com.example.fitness360.components.WaveBackground
 
 import androidx.compose.runtime.*
-import kotlinx.coroutines.launch
+
+
+import com.example.fitness360.network.ApiClient
+import com.example.fitness360.network.AuthService
+
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+import com.example.fitness360.components.CustomButton
+
+import com.example.fitness360.network.LoginRequest
+import com.example.fitness360.network.LoginResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+import com.example.fitness360.utils.saveUserUid
+import com.example.fitness360.utils.getUserUid
+
 
 
 @Composable
 fun LoginScreen(navController: NavController) {
 
-    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var loginStatus by remember { mutableStateOf("") }
+
+    // Crear instancia de AuthService usando Retrofit
+    val authService = ApiClient.retrofit.create(AuthService::class.java)
 
     Box(
         modifier = Modifier
@@ -105,6 +128,31 @@ fun LoginScreen(navController: NavController) {
                 text = "Iniciar Sesión",
                 onClick = {
 
+                    val loginRequest = LoginRequest(email, password)
+                    val call = authService.login(loginRequest)
+
+                    // Realizar la llamada de autenticación en Retrofit
+                    call.enqueue(object : Callback<LoginResponse> {
+                        override fun onResponse(
+                            call: Call<LoginResponse>,
+                            response: Response<LoginResponse>
+                        ) {
+                            if (response.isSuccessful) {
+                                val loginResponse = response.body()
+                                if (loginResponse != null) {
+                                    saveUserUid(context, loginResponse.uid)
+                                    navController.navigate("home") // Redirige si el login es exitoso
+                                }
+                            } else {
+                                loginStatus = "Login fallido. Verifica tus credenciales."
+                            }
+                        }
+
+                        override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                            loginStatus = "Error de red: ${t.message}"
+                        }
+                    })
+
                 }
             )
 
@@ -133,4 +181,7 @@ fun LoginScreen(navController: NavController) {
             )
         }
     }
+
+
+
 }

@@ -36,11 +36,75 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+
+import com.example.fitness360.network.UserData
+
+
+import com.example.fitness360.utils.getUserUid
 
 import com.example.fitness360.components.BottomNavigationBar
+import com.example.fitness360.network.ApiClient
+
+import com.example.fitness360.network.UserDataRequest
+import com.example.fitness360.network.UserService
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 
 @Composable
 fun HomeScreen(navController: NavController) {
+
+    val context = LocalContext.current
+    val uid = getUserUid(context)
+
+    var userData by remember { mutableStateOf<UserData?>(null) }
+    var loadStatus by remember { mutableStateOf("Cargando...") }
+
+
+    val userService = ApiClient.retrofit.create(UserService::class.java)
+
+    val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+
+    println(currentDate)
+
+    // Realiza la solicitud cuando se carga la pantalla
+    LaunchedEffect(Unit) {
+
+        val userDataRequest = uid?.let { UserDataRequest(it) }
+
+        val call = userService.getUserDataByID(userDataRequest.toString())
+
+        call.enqueue(object : Callback<UserData> {
+            override fun onResponse(call: Call<UserData>, response: Response<UserData>) {
+                if (response.isSuccessful) {
+                    userData = response.body()  // Actualiza userData con la respuesta exitosa
+                    loadStatus = ""
+                } else {
+                    loadStatus = "Error al cargar los datos del usuario."
+                }
+            }
+
+            override fun onFailure(call: Call<UserData>, t: Throwable) {
+                loadStatus = "Error de red: ${t.message}"
+            }
+        })
+
+    }
+
+
+
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -62,19 +126,24 @@ fun HomeScreen(navController: NavController) {
                     color = Color.Black
                 )
                 Text(
-                    text = "ACA",
+                    text = userData?.name ?: "Cargando...",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF0066A1)
                 )
             }
 
-            MultiLayerCircularIndicators(
-                carbProgress = 0.5f,
-                proteinProgress = 0.2f,
-                fatProgress = 0.3f,
-                kcalsProgress = 0.5f
-            )
+            userData?.let {
+
+                MultiLayerCircularIndicators(
+                    carbProgress = 0.5f,
+                    proteinProgress = 0.2f,
+                    fatProgress = 0.3f,
+                    kcalsProgress = 0.5f,
+                    userData = it
+                )
+
+            }
 
             Spacer(modifier = Modifier.height(24.dp)) // Espacio uniforme
 
@@ -130,17 +199,19 @@ fun MultiLayerCircularIndicators(
     carbProgress: Float,
     proteinProgress: Float,
     fatProgress: Float,
-    kcalsProgress: Float
+    kcalsProgress: Float,
+    userData: UserData
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(start = 16.dp)
     ) {
+
         // Datos de nutrientes
         val nutrients = listOf(
-            Triple("Carbohidratos", "50/110gr", Color(0xFF7FB2D0)),
-            Triple("Proteínas", "30/90gr", Color(0xFF3385B4)),
-            Triple("Grasas", "25/40gr", Color(0xFF05476D))
+            Triple("Carbohidratos", "50/${userData?.carbs ?: "0"}gr", Color(0xFF7FB2D0)),
+            Triple("Proteínas", "30/${userData?.proteins ?: "0"}gr", Color(0xFF3385B4)),
+            Triple("Grasas", "25/${userData?.fats ?: "0"}gr", Color(0xFF05476D))
         )
 
         Column(horizontalAlignment = Alignment.Start) {

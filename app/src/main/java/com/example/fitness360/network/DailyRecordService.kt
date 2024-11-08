@@ -1,29 +1,28 @@
-package com.example.fitness360.network
-
-import retrofit2.Call
-import retrofit2.http.Body
+import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
-data class DailyRecordDataRequest(val uid: String)
 
+
+data class Nutrients(
+    val consumedCarbs: Float,
+    val consumedProteins: Float,
+    val consumedFats: Float,
+    val consumedKcals: Float
+)
 
 data class DailyRecord(
-
     val registerID: String,
-    val consumedCarbs: String,
-    val consumedProteins: String,
-    val consumedFats: String,
-    val consumedKcals: Float,
+    val nutrients: Nutrients,
     val steps: Float,
-    val burnedKcals: Float,
-
+    val burnedKcals: Float
 )
 
 interface DailyRecordService {
-    @GET("api/dailyRecord/getdailyRecord")
-    fun getDailyRecord(
-        @Query("uid") userId: String,
-        @Query("date") date: String
-    ): Call<DailyRecord>
+    @GET("api/dailyRecord/getDailyRecord/{uid}/{date}")
+    suspend fun getDailyRecord(
+        @Path("uid") userId: String,
+        @Path("date") date: String
+    ): Response<DailyRecord>
 }

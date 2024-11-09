@@ -18,11 +18,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.fitness360.R // Ajusta este import a tu proyecto
+import com.example.fitness360.R
+import com.example.fitness360.network.Food
 
 @Composable
-fun ProductCard() {
-    var showDialog by remember { mutableStateOf(false) } // Controla la visibilidad del cuadro de diálogo
+fun ProductCard(food: Food) {
+    var showDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -48,7 +49,7 @@ fun ProductCard() {
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.product_image),
-                        contentDescription = "Producto",
+                        contentDescription = food.name,
                         contentScale = ContentScale.Fit,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -76,7 +77,16 @@ fun ProductCard() {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Información nutricional
+                // Nombre del producto y marca
+                Text(
+                    text = "${food.name} - ${food.brand}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Color.White,
+                    modifier = Modifier.padding(8.dp)
+                )
+
+                // Información nutricional dinámica
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -93,9 +103,9 @@ fun ProductCard() {
                             horizontalAlignment = Alignment.Start,
                             modifier = Modifier.weight(1f)
                         ) {
-                            NutritionalInfo(label = "Carbohidratos", value = "50gr/100gr")
+                            NutritionalInfo(label = "Carbohidratos", value = "${food.nutrients.carbs}gr/100gr")
                             Spacer(modifier = Modifier.height(8.dp))
-                            NutritionalInfo(label = "Kilocalorías", value = "125 kcals/100gr")
+                            NutritionalInfo(label = "Kilocalorías", value = "${food.nutrients.kcals} kcals/100gr")
                         }
 
                         Spacer(modifier = Modifier.width(32.dp))
@@ -104,9 +114,9 @@ fun ProductCard() {
                             horizontalAlignment = Alignment.Start,
                             modifier = Modifier.weight(1f)
                         ) {
-                            NutritionalInfo(label = "Grasas", value = "25gr/100gr")
+                            NutritionalInfo(label = "Grasas", value = "${food.nutrients.fats}gr/100gr")
                             Spacer(modifier = Modifier.height(8.dp))
-                            NutritionalInfo(label = "Proteínas", value = "30gr/100gr")
+                            NutritionalInfo(label = "Proteínas", value = "${food.nutrients.proteins}gr/100gr")
                         }
                     }
                 }
@@ -130,7 +140,6 @@ fun ProductCard() {
                 )
             }
         }
-
     }
 }
 
@@ -142,7 +151,6 @@ fun AddToMealDialog(onDismiss: () -> Unit, onConfirm: (String, String) -> Unit) 
     val mealOptions = listOf("Desayuno", "Almuerzo", "Merienda", "Cena")
     var expanded by remember { mutableStateOf(false) }
 
-    // Fondo oscuro y diálogo en el centro de la tarjeta
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -227,7 +235,6 @@ fun AddToMealDialog(onDismiss: () -> Unit, onConfirm: (String, String) -> Unit) 
         }
     }
 }
-
 
 @Composable
 fun NutritionalInfo(label: String, value: String) {

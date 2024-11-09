@@ -33,17 +33,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import com.example.fitness360.network.ApiClient
 
 
 import com.example.fitness360.components.BottomNavigationBar
 import com.example.fitness360.components.ProductCard
+import com.example.fitness360.network.Food
+import com.example.fitness360.network.FoodService
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchFoodScreen(navController: NavController) {
-    val match = remember { mutableStateOf(true) }
+    val foodService = ApiClient.retrofit.create(FoodService::class.java)
+    var searchQuery by remember { mutableStateOf("") }
+    var foodResults by remember { mutableStateOf<List<Food>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+    var noResults by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -62,8 +73,8 @@ fun SearchFoodScreen(navController: NavController) {
                     .padding(horizontal = 2.dp)
             ) {
                 TextField(
-                    value = "",
-                    onValueChange = {},
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
                     placeholder = {
                         Text(
                             text = "Buscar Producto",
@@ -79,7 +90,20 @@ fun SearchFoodScreen(navController: NavController) {
                             modifier = Modifier
                                 .size(24.dp)
                                 .clickable {
-                                    match.value = false // Al hacer clic, se establece match en false
+                                    coroutineScope.launch {
+                                        try {
+                                            val response = foodService.searchFoodByName(searchQuery)
+                                            println(response);
+                                            if (response.isSuccessful) {
+                                                foodResults = response.body() ?: emptyList()
+                                                noResults = foodResults.isEmpty()
+                                            } else {
+                                                noResults = true
+                                            }
+                                        } catch (e: Exception) {
+                                            noResults = true
+                                        }
+                                    }
                                 }
                         )
                     },
@@ -109,7 +133,7 @@ fun SearchFoodScreen(navController: NavController) {
                         modifier = Modifier
                             .size(24.dp)
                             .clickable {
-                                match.value = true // Al hacer clic, se establece match en false
+                                // Aquí se podría implementar la funcionalidad de escaneo
                             }
                     )
                 }
@@ -117,17 +141,8 @@ fun SearchFoodScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (match.value) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    items(5) { // Número de ProductCards a mostrar
-                        ProductCard()
-                    }
-                }
-            } else {
-                // Pantalla de "No se han encontrado resultados"
+            if (noResults) {
+                // Mostrar pantalla de "No se encontraron resultados"
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -147,6 +162,16 @@ fun SearchFoodScreen(navController: NavController) {
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium
                     )
+                }
+            } else {
+                // Mostrar la lista de productos encontrados
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    items(foodResults.size) { index ->
+                        ProductCard(food = foodResults[index])
+                    }
                 }
             }
         }

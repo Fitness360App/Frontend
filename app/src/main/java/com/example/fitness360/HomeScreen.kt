@@ -65,50 +65,49 @@ import java.util.Date
 import java.util.Locale
 
 
+import kotlinx.coroutines.delay
+
 @Composable
 fun HomeScreen(navController: NavController) {
-
     val context = LocalContext.current
     val uid = getUserUid(context)
     var userData by remember { mutableStateOf<UserData?>(null) }
-    var loadStatus by remember { mutableStateOf("Cargando...") }
-    val coroutineScope = rememberCoroutineScope()
-    val userService = ApiClient.retrofit.create(UserService::class.java)
-
-    val dailyRecordService = ApiClient.retrofit.create(DailyRecordService::class.java)
     var dailyRecord by remember { mutableStateOf<DailyRecord?>(null) }
+    var loadStatus by remember { mutableStateOf("Cargando...") }
+    val userService = ApiClient.retrofit.create(UserService::class.java)
+    val dailyRecordService = ApiClient.retrofit.create(DailyRecordService::class.java)
 
-    LaunchedEffect(Unit) {
-        // Cargar datos de usuario
+    // Intervalo de sondeo en milisegundos (ejemplo: 10 segundos)
+    val pollingInterval = 10000L
+
+    LaunchedEffect(uid) {
         uid?.let {
-            coroutineScope.launch {
+            while (true) { // Bucle infinito para el sondeo
                 try {
-                    val response = userService.getUserDataByID(it)
-                    if (response.isSuccessful) {
-                        userData = response.body()
-                        loadStatus = ""
+                    // Cargar datos de usuario
+                    val userResponse = userService.getUserDataByID(it)
+                    if (userResponse.isSuccessful) {
+                        userData = userResponse.body()
+                        loadStatus = "Datos del usuario cargados"
                     } else {
                         loadStatus = "Error al cargar los datos del usuario."
+                    }
+
+                    // Cargar registro diario
+                    val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+                    val recordResponse = dailyRecordService.getDailyRecord(uid, "08/11/2024")
+                    if (recordResponse.isSuccessful) {
+                        dailyRecord = recordResponse.body()
+                        loadStatus = "Registro diario cargado"
+                    } else {
+                        loadStatus = "Error al cargar el registro diario."
                     }
                 } catch (e: Exception) {
                     loadStatus = "Error de red: ${e.message}"
                 }
-            }
 
-            val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-
-            // Cargar registro diario
-            try {
-                val response = dailyRecordService.getDailyRecord(uid, currentDate)
-                if (response.isSuccessful) {
-                    dailyRecord = response.body()
-                    println(dailyRecord)
-                    loadStatus = ""
-                } else {
-                    loadStatus = "Error al cargar el registro diario."
-                }
-            } catch (e: Exception) {
-                loadStatus = "Error de red: ${e.message}"
+                // Espera antes de la próxima actualización
+                delay(pollingInterval)
             }
         }
     }
@@ -123,7 +122,7 @@ fun HomeScreen(navController: NavController) {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.Start
         ) {
-            // Encabezado con padding superior ajustado
+            // Encabezado
             Column(
                 modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)
             ) {
@@ -141,7 +140,7 @@ fun HomeScreen(navController: NavController) {
                 )
             }
 
-            // Verifica que ambos datos, userData y dailyRecord, estén disponibles antes de renderizar los indicadores
+            // Verificar si los datos están disponibles antes de renderizar los indicadores
             userData?.let { user ->
                 dailyRecord?.let { record ->
                     MultiLayerCircularIndicators(
@@ -157,6 +156,7 @@ fun HomeScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Mostrar resumen de actividad si dailyRecord tiene datos
             dailyRecord?.let { record ->
                 ActivitySummary(
                     steps = record.steps.toInt(),
@@ -166,12 +166,11 @@ fun HomeScreen(navController: NavController) {
             }
         }
 
-        // Barra de navegación en la parte inferior, fija
-        BottomNavigationBar(
-            navController = navController
-        )
+        // Barra de navegación
+        BottomNavigationBar(navController = navController)
     }
 }
+
 
 
 @Composable

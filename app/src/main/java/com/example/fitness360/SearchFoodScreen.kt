@@ -39,12 +39,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.example.fitness360.network.ApiClient
+import androidx.compose.ui.platform.LocalContext
 
 
 import com.example.fitness360.components.BottomNavigationBar
 import com.example.fitness360.components.ProductCard
 import com.example.fitness360.network.Food
 import com.example.fitness360.network.FoodService
+import com.example.fitness360.utils.getUserUid
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,6 +57,8 @@ fun SearchFoodScreen(navController: NavController) {
     var foodResults by remember { mutableStateOf<List<Food>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
     var noResults by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val uid = getUserUid(context)
 
     Box(
         modifier = Modifier
@@ -170,7 +174,9 @@ fun SearchFoodScreen(navController: NavController) {
                         .fillMaxSize()
                 ) {
                     items(foodResults.size) { index ->
-                        ProductCard(food = foodResults[index])
+                        if (uid != null) {
+                            ProductCard(food = foodResults[index], uid)
+                        }
                     }
                 }
             }

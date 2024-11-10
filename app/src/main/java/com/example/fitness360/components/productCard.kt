@@ -13,17 +13,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fitness360.R
+import com.example.fitness360.network.AddFoodRequest
 import com.example.fitness360.network.Food
+import kotlinx.coroutines.launch
+import com.example.fitness360.network.ApiClient
+import com.example.fitness360.network.FoodService
+import com.example.fitness360.network.MealService
 
 @Composable
-fun ProductCard(food: Food) {
+fun ProductCard(food: Food, uid: String) {
     var showDialog by remember { mutableStateOf(false) }
+
+    // Capitaliza cada palabra en el nombre del producto
+    val formattedName = food.name.split(" ").joinToString(" ") { word ->
+        word.lowercase().replaceFirstChar { it.uppercase() }
+    }
 
     Box(
         modifier = Modifier
@@ -77,9 +89,9 @@ fun ProductCard(food: Food) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Nombre del producto y marca
+                // Nombre del producto y marca con formato
                 Text(
-                    text = "${food.name} - ${food.brand}",
+                    text = "$formattedName - ${food.brand}",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = Color.White,
@@ -103,9 +115,9 @@ fun ProductCard(food: Food) {
                             horizontalAlignment = Alignment.Start,
                             modifier = Modifier.weight(1f)
                         ) {
-                            NutritionalInfo(label = "Carbohidratos", value = "${food.nutrients.carbs}gr/100gr")
+                            NutritionalInfo(label = "Carbohidratos", value = "${food.nutrients.carbs.toInt()}gr/100gr")
                             Spacer(modifier = Modifier.height(8.dp))
-                            NutritionalInfo(label = "Kilocalorías", value = "${food.nutrients.kcals} kcals/100gr")
+                            NutritionalInfo(label = "Kilocalorías", value = "${food.nutrients.kcals.toInt()} kcals/100gr")
                         }
 
                         Spacer(modifier = Modifier.width(32.dp))
@@ -114,42 +126,44 @@ fun ProductCard(food: Food) {
                             horizontalAlignment = Alignment.Start,
                             modifier = Modifier.weight(1f)
                         ) {
-                            NutritionalInfo(label = "Grasas", value = "${food.nutrients.fats}gr/100gr")
+                            NutritionalInfo(label = "Grasas", value = "${food.nutrients.fats.toInt()}gr/100gr")
                             Spacer(modifier = Modifier.height(8.dp))
-                            NutritionalInfo(label = "Proteínas", value = "${food.nutrients.proteins}gr/100gr")
+                            NutritionalInfo(label = "Proteínas", value = "${food.nutrients.proteins.toInt()}gr/100gr")
                         }
                     }
                 }
             }
         }
 
-        // Muestra el diálogo sobre la tarjeta cuando showDialog es true
         if (showDialog) {
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .clip(RoundedCornerShape(10.dp)), // Aplica la forma redondeada
-                contentAlignment = Alignment.Center
-            ) {
-                AddToMealDialog(
-                    onDismiss = { showDialog = false },
-                    onConfirm = { mealType, quantity ->
-                        // Aquí puedes manejar la lógica para añadir la cantidad a la comida seleccionada
-                        showDialog = false
-                    }
-                )
-            }
+            AddToMealDialog(
+                foodBarcode = food.barcode,
+                uid = uid,
+                onDismiss = { showDialog = false },
+                onConfirm = { mealType, quantity ->
+                    showDialog = false
+                }
+            )
         }
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddToMealDialog(onDismiss: () -> Unit, onConfirm: (String, String) -> Unit) {
-    var selectedMeal by remember { mutableStateOf("Desayuno") }
+fun AddToMealDialog(
+    foodBarcode: String,
+    uid: String,
+    onDismiss: () -> Unit,
+    onConfirm: (String, String) -> Unit
+) {
+    var selectedMeal by remember { mutableStateOf("breakfast") }
     var quantity by remember { mutableStateOf("") }
-    val mealOptions = listOf("Desayuno", "Almuerzo", "Merienda", "Cena")
+    val mealOptions = listOf("breakfast", "lunch", "snack", "dinner")
     var expanded by remember { mutableStateOf(false) }
+    val mealService = ApiClient.retrofit.create(MealService::class.java)
+
+    val coroutineScope = rememberCoroutineScope() // Define el scope de corrutina
 
     Box(
         modifier = Modifier
@@ -160,7 +174,7 @@ fun AddToMealDialog(onDismiss: () -> Unit, onConfirm: (String, String) -> Unit) 
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.8f) // Ajusta el ancho del diálogo
+                .fillMaxWidth(0.8f)
                 .background(Color.White, shape = RoundedCornerShape(16.dp))
                 .padding(16.dp)
         ) {
@@ -174,7 +188,6 @@ fun AddToMealDialog(onDismiss: () -> Unit, onConfirm: (String, String) -> Unit) 
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Selector de tipo de comida
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -201,7 +214,6 @@ fun AddToMealDialog(onDismiss: () -> Unit, onConfirm: (String, String) -> Unit) 
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Campo de texto para la cantidad
                 OutlinedTextField(
                     value = quantity,
                     onValueChange = { quantity = it },
@@ -216,7 +228,6 @@ fun AddToMealDialog(onDismiss: () -> Unit, onConfirm: (String, String) -> Unit) 
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Botones de acción
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -225,7 +236,40 @@ fun AddToMealDialog(onDismiss: () -> Unit, onConfirm: (String, String) -> Unit) 
                         Text("Cancelar", color = Color.Gray)
                     }
                     Button(
-                        onClick = { onConfirm(selectedMeal, quantity) },
+                        onClick = {
+                            coroutineScope.launch {
+                                try {
+                                    println("ENTRO DONDE QUIERES")
+
+                                    // Ejecutar la solicitud en Dispatchers.IO para operaciones de red
+                                    withContext(Dispatchers.IO) {
+                                        val request = AddFoodRequest(
+                                            barcode = foodBarcode,
+                                            uid = uid,
+                                            type = selectedMeal.lowercase()
+                                        )
+                                        println(request)
+                                        println("ENTRO DONDE QUIERES2")
+
+                                        // Realiza la solicitud en segundo plano
+                                        val response = mealService.addFoodToMeal(request).execute()
+                                        println(response)
+
+                                        withContext(Dispatchers.Main) {
+                                            if (response.isSuccessful) {
+                                                onConfirm(selectedMeal, quantity)
+                                            } else {
+                                                // Maneja el error aquí
+                                                println("Error en la respuesta: ${response.errorBody()}")
+                                            }
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    // Maneja la excepción aquí
+                                    println("Error al realizar la solicitud: ${e.message}")
+                                }
+                            }
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF005A9E))
                     ) {
                         Text("Añadir", color = Color.White)
@@ -235,6 +279,7 @@ fun AddToMealDialog(onDismiss: () -> Unit, onConfirm: (String, String) -> Unit) 
         }
     }
 }
+
 
 @Composable
 fun NutritionalInfo(label: String, value: String) {

@@ -5,33 +5,73 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fitness360.components.BottomNavigationBar
+import com.example.fitness360.network.ApiClient
+import com.example.fitness360.network.UserService
+import com.example.fitness360.utils.getUserUid
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import com.example.fitness360.network.UserData
 
 @Composable
 fun SettingsScreen(navController: NavController) {
-    var showEditDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val uid = getUserUid(context)
+    var userData by remember { mutableStateOf<UserData?>(null) }
+    var loadStatus by remember { mutableStateOf("Cargando...") }
+    val userService = ApiClient.retrofit.create(UserService::class.java)
+    val coroutineScope = rememberCoroutineScope()
 
-    // Estados para todos los campos de configuración
-    var userName by remember { mutableStateOf("Acaymo") }
-    var userLastName by remember { mutableStateOf("Granado Sánchez") }
-    var userEmail by remember { mutableStateOf("acaElCrack@gmail.com") }
-    var currentWeight by remember { mutableStateOf("60") }
-    var targetWeight by remember { mutableStateOf("80") }
-    var height by remember { mutableStateOf("171") }
-    var age by remember { mutableStateOf("20 años") }
-    var activityLevel by remember { mutableStateOf("Alto") }
-    var language by remember { mutableStateOf("Español (ES)") }
+    // Estados para los campos de configuración del usuario
+    var showEditDialog by remember { mutableStateOf(false) }
+    var userName by remember { mutableStateOf("") }
+    var userLastName by remember { mutableStateOf("") }
+    var userEmail by remember { mutableStateOf("") }
+    var currentWeight by remember { mutableStateOf("") }
+    var targetWeight by remember { mutableStateOf("") }
+    var height by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }
+    var activityLevel by remember { mutableStateOf("") }
+    var language by remember { mutableStateOf("Español (ES)") } // Se mantiene estático
+
+    LaunchedEffect(uid) {
+        uid?.let {
+            while (true) {
+                try {
+                    val userResponse = userService.getUserDataByID(it)
+                    if (userResponse.isSuccessful) {
+                        userData = userResponse.body()
+                        loadStatus = "Datos del usuario cargados"
+                        userData?.let { data ->
+                            userName = data.name
+                            userLastName = "${data.lastName1} "
+                            userEmail = data.email
+                            currentWeight = data.actualWeight.toString()
+                            targetWeight = data.goalWeight.toString()
+                            height = data.height.toString()
+                            age = data.age.toString()
+                            activityLevel = data.activityLevel
+                        }
+                    } else {
+                        loadStatus = "Error al cargar los datos del usuario."
+                    }
+                } catch (e: Exception) {
+                    loadStatus = "Error de red: ${e.message}"
+                }
+                delay(10000L) // Intervalo de sondeo cada 10 segundos
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -87,7 +127,7 @@ fun SettingsScreen(navController: NavController) {
             SettingsOption("Peso Actual", "$currentWeight kg")
             SettingsOption("Objetivo de Peso", "$targetWeight kg")
             SettingsOption("Altura", "$height cm")
-            SettingsOption("Edad", age)
+            SettingsOption("Edad", "$age años")
             SettingsOption("Nivel de Actividad", activityLevel)
             SettingsOption("Idioma", language)
 
@@ -101,7 +141,6 @@ fun SettingsScreen(navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Botón de Configurar Cuenta
                 Text(
                     text = "Configurar Cuenta",
                     fontSize = 18.sp,
@@ -113,7 +152,6 @@ fun SettingsScreen(navController: NavController) {
                         .padding(vertical = 8.dp, horizontal = 16.dp)
                 )
 
-                // Botón de Eliminar Cuenta
                 Text(
                     text = "Eliminar Cuenta",
                     fontSize = 18.sp,
@@ -155,6 +193,7 @@ fun SettingsScreen(navController: NavController) {
         }
     }
 }
+
 
 
 

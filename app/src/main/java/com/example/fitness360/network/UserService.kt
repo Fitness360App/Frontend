@@ -25,7 +25,8 @@ data class UserData(
     val carbs: Int,
     val proteins: Int,
     val fats: Int,
-    val kcals: Int
+    val kcals: Int,
+    val email: String
 )
 
 interface UserService {

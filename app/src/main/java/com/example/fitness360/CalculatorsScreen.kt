@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -15,17 +15,57 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fitness360.components.BottomNavigationBar
+import com.example.fitness360.network.ApiClient
+import com.example.fitness360.network.UserData
+import com.example.fitness360.network.UserService
+import androidx.compose.ui.platform.LocalContext
+import com.example.fitness360.network.CalculatorService
+import com.example.fitness360.utils.getUserUid
+import kotlinx.coroutines.launch
 
 @Composable
 fun CalculatorsScreen(navController: NavController) {
+    val context = LocalContext.current
+    val uid = getUserUid(context)
+    var userData by remember { mutableStateOf<UserData?>(null) }
+    val userService = ApiClient.retrofit.create(UserService::class.java)
+    val calculatorService = ApiClient.retrofit.create(CalculatorService::class.java)
+
+    var imc by remember { mutableStateOf<String?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+
+    // Cargar datos del usuario
+    LaunchedEffect(uid) {
+        uid?.let {
+            coroutineScope.launch {
+                try {
+                    val response = userService.getUserDataByID(it)
+                    if (response.isSuccessful) {
+                        userData = response.body()
+
+                        userData?.let { user ->
+
+                            // Llamada a la API para calcular el IMC
+                            val imcResponse = calculatorService.calculateIMCByUserData(uid)
+                            if (imcResponse.isSuccessful) {
+                                imc = imcResponse.body()?.imc.toString()
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    // Manejar error si ocurre
+                }
+            }
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, top = 16.dp, end = 16.dp) // Padding uniforme en todo el Box
+            .padding(start = 16.dp, top = 16.dp, end = 16.dp)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.Start
         ) {
             // Encabezado con padding superior ajustado
@@ -44,28 +84,36 @@ fun CalculatorsScreen(navController: NavController) {
                 )
             }
 
-            InfoCard(
-                title = "Sus datos introducidos son",
-                items = listOf(
-                    "Altura" to "171 cm",
-                    "Peso" to "60 kg",
-                    "Edad" to "20 años",
-                    "Objetivo" to "Ganar Peso"
+            // Verificar que los datos del usuario estén disponibles
+            userData?.let { user ->
+                // Llenar los campos con los datos del usuario
+                val userInfo = listOf(
+                    "Altura" to "${user.height} cm",
+                    "Peso" to "${user.actualWeight} kg",
+                    "Edad" to "${user.age} años",
+                    "Objetivo" to if (user.goalWeight > user.actualWeight) "Ganar Peso" else "Perder Peso"
                 )
-            )
 
-            Spacer(modifier = Modifier.height(16.dp)) // Espacio uniforme
-
-            InfoCard(
-                title = "Sus macros son:",
-                items = listOf(
-                    "Kilocalorías" to "2767 kcals",
-                    "Proteínas" to "207 g",
-                    "Grasas" to "77 g",
-                    "Carbohidratos" to "311 g",
-                    "IMC" to "20.52"
+                InfoCard(
+                    title = "Sus datos introducidos son",
+                    items = userInfo
                 )
-            )
+
+                Spacer(modifier = Modifier.height(16.dp)) // Espacio uniforme
+
+                val macroInfo = listOf(
+                    "Kilocalorías" to "${user.kcals} kcals",
+                    "Proteínas" to "${user.proteins} g",
+                    "Grasas" to "${user.fats} g",
+                    "Carbohidratos" to "${user.carbs} g",
+                    "IMC" to (imc ?: "Cargando...")
+                )
+
+                InfoCard(
+                    title = "Sus macros son:",
+                    items = macroInfo
+                )
+            }
         }
 
         // Barra de navegación en la parte inferior, fija
@@ -75,6 +123,12 @@ fun CalculatorsScreen(navController: NavController) {
     }
 }
 
+// Función para calcular el índice de masa corporal (IMC)
+fun calculateBMI(weight: Int, height: Int): Float {
+    val heightInMeters = height / 100f
+    return weight / (heightInMeters * heightInMeters)
+}
+
 @Composable
 fun InfoCard(title: String, items: List<Pair<String, String>>) {
     Card(
@@ -82,7 +136,7 @@ fun InfoCard(title: String, items: List<Pair<String, String>>) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .shadow(8.dp, shape = RoundedCornerShape(12.dp)), // Sombra para profundidad
+            .shadow(8.dp, shape = RoundedCornerShape(12.dp)),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Box(

@@ -1,5 +1,7 @@
 package com.example.fitness360
 
+import DailyRecordRequest
+import DailyRecordService
 import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
@@ -35,10 +37,17 @@ import com.example.fitness360.network.Macros
 import com.example.fitness360.network.RegisterRequest
 import com.example.fitness360.network.RegisterResponse
 import com.example.fitness360.utils.saveUserUid
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 var email = ""
 var password = ""
@@ -116,7 +125,40 @@ fun RegisterScreen(navController: NavController) {
                                 val registerResponse = response.body()
                                 if (registerResponse != null) {
                                     saveUserUid(context, registerResponse.uid)
-                                    navController.navigate("home") // Redirige si el login es exitoso
+                                    // Llamada al servicio de registro para crearlo
+                                    val dailyRecodService = ApiClient.retrofit.create(DailyRecordService::class.java)
+
+                                    // Crear el servicio de DailyRecord
+                                    val dailyRecordService = ApiClient.retrofit.create(DailyRecordService::class.java)
+
+                                    // Obtener la fecha actual en formato `dd/MM/yyyy`
+                                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                    val currentDate = dateFormat.format(Date())
+
+                                    // Crear la solicitud para DailyRecord con el UID y la fecha actual
+                                    val dailyRecordRequest = DailyRecordRequest(uid = registerResponse.uid, date = currentDate)
+
+                                    // Llamada a la API para crear el DailyRecord
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        try {
+                                            val response = dailyRecordService.createDailyRecord(dailyRecordRequest)
+                                            withContext(Dispatchers.Main) {
+                                                if (response.isSuccessful) {
+                                                    // Navegar a Home solo si el registro y el DailyRecord fueron exitosos
+                                                    navController.navigate("home") {
+                                                        popUpTo("register") { inclusive = true }
+                                                    }
+                                                } else {
+                                                    // Manejo de error al crear el DailyRecord
+                                                    registerStatus = "Error al crear el registro diario: ${response.message()}"
+                                                }
+                                            }
+                                        } catch (e: Exception) {
+                                            withContext(Dispatchers.Main) {
+                                                registerStatus = "Error de red al crear el registro diario: ${e.message}"
+                                            }
+                                        }
+                                    }
                                 }
                             } else {
                                 // Manejo de errores

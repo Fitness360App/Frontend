@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
     val navController = rememberNavController()
 
-    NavHost(navController, startDestination = "home") {
+    NavHost(navController, startDestination = "auth") {
         composable("auth") { AuthScreen(navController) }
         composable("login") { LoginScreen(navController) }
         composable("register") { RegisterScreen(navController) }

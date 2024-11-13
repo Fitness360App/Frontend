@@ -13,41 +13,66 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fitness360.components.BottomNavigationBar
+import com.example.fitness360.utils.getUserUid
+import com.example.fitness360.network.ApiClient
+import com.example.fitness360.network.MealService
 
 data class FoodItem(val name: String, var quantity: Int, val calories: Int, val carbs: Int, val fats: Int, val proteins: Int)
 
 @Composable
 fun MealScreen(navController: NavController) {
-    val desayuno = remember {
-        mutableStateListOf(
-            FoodItem("Manzana", 100, 52, 14, 0, 0),
-            FoodItem("Pan Integral", 50, 130, 25, 2, 5)
-        )
-    }
-    val almuerzo = remember {
-        mutableStateListOf(
-            FoodItem("Pasta", 200, 260, 52, 1, 8),
-            FoodItem("Pollo a la plancha", 150, 165, 0, 3, 31)
-        )
-    }
-    val merienda = remember {
-        mutableStateListOf(
-            FoodItem("Yogur", 125, 75, 8, 3, 5),
-            FoodItem("Nueces", 30, 200, 4, 20, 5)
-        )
-    }
-    val cena = remember {
-        mutableStateListOf(
-            FoodItem("Ensalada Mixta", 150, 120, 8, 7, 4),
-            FoodItem("Salmón", 100, 208, 0, 13, 20)
-        )
-    }
+
+
+    val context = LocalContext.current
+    val uid = getUserUid(context) // Obtén el uid usando el contexto actual
+
+    val mealService = ApiClient.retrofit.create(MealService::class.java)
+
+    // State para cada tipo de comida
+    val desayuno = remember { mutableStateListOf<FoodItem>() }
+    val almuerzo = remember { mutableStateListOf<FoodItem>() }
+    val merienda = remember { mutableStateListOf<FoodItem>() }
+    val cena = remember { mutableStateListOf<FoodItem>() }
 
     var selectedFood by remember { mutableStateOf<FoodItem?>(null) }
+
+    // Cargar cada tipo de comida cuando se crea la pantalla
+    LaunchedEffect(uid) {
+        uid?.let { userId ->
+            // Lista de pares de tipo de comida y su lista correspondiente
+            val mealTypes = listOf(
+                "breakfast" to desayuno,
+                "lunch" to almuerzo,
+                "snack" to merienda,
+                "dinner" to cena
+            )
+
+            // Iterar sobre cada par y cargar los alimentos
+            mealTypes.forEach { (mealType, mealList) ->
+                val response = mealService.getMealWithFoods(userId, mealType)
+                if (response.isSuccessful) {
+                    response.body()?.let { foods ->
+                        mealList.addAll(foods.map { food ->
+                            FoodItem(
+                                name = food.name,
+                                quantity = food.servingSize,
+                                calories = food.kcals,
+                                carbs = food.carbs,
+                                fats = food.fats,
+                                proteins = food.proteins
+                            )
+                        })
+                    }
+                }
+            }
+        }
+    }
+
 
     Box(
         modifier = Modifier
@@ -55,38 +80,24 @@ fun MealScreen(navController: NavController) {
             .padding(start = 16.dp, top = 16.dp, end = 16.dp)
     ) {
         Column(
-            modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)
+            modifier = Modifier
+                .padding(start = 16.dp, bottom = 16.dp)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.Start
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.Start
-            ) {
-                // Encabezado con padding superior ajustado
-                Column() {
-                    Text(
-                        text = "COMIDAS",
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF333333)
-                    )
-                    Text(
-                        text = "DIARIAS",
-                        fontSize = 22.sp,
-                        color = Color(0xFF007ACC),
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+            // Encabezado
+            Column(modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)) {
+                Text("COMIDAS", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Color(0xFF333333))
+                Text("DIARIAS", fontSize = 22.sp, color = Color(0xFF007ACC), fontWeight = FontWeight.SemiBold)
             }
 
+            // Mostrar cada tipo de comida con sus alimentos
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 item { MealList("Desayuno", desayuno) { selectedFood = it } }
                 item { MealList("Almuerzo", almuerzo) { selectedFood = it } }
                 item { MealList("Merienda", merienda) { selectedFood = it } }
                 item { MealList("Cena", cena) { selectedFood = it } }
-                item { Spacer(modifier = Modifier.height(56.dp)) } // Añadir un espacio al final
+                item { Spacer(modifier = Modifier.height(56.dp)) }
             }
         }
 
@@ -96,10 +107,7 @@ fun MealScreen(navController: NavController) {
             EditFoodDialog(
                 food = food,
                 onDismiss = { selectedFood = null },
-                onConfirm = { quantity ->
-                    updateFoodQuantity(desayuno, almuerzo, merienda, cena, food, quantity)
-                    selectedFood = null
-                },
+                onConfirm = { quantity -> updateFoodQuantity(desayuno, almuerzo, merienda, cena, food, quantity) },
                 onDelete = {
                     desayuno.remove(food)
                     almuerzo.remove(food)
@@ -110,7 +118,11 @@ fun MealScreen(navController: NavController) {
             )
         }
     }
+
+
+
 }
+
 
 // Función para actualizar la cantidad de un alimento en la lista correspondiente
 fun updateFoodQuantity(
@@ -201,8 +213,6 @@ fun FoodItemRow(food: FoodItem, onClick: () -> Unit) {
     }
 }
 
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditFoodDialog(food: FoodItem, onDismiss: () -> Unit, onConfirm: (Int) -> Unit, onDelete: () -> Unit) {
@@ -236,3 +246,7 @@ fun EditFoodDialog(food: FoodItem, onDismiss: () -> Unit, onConfirm: (Int) -> Un
         }
     )
 }
+
+
+
+

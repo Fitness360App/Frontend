@@ -20,9 +20,14 @@ import androidx.navigation.NavController
 import com.example.fitness360.components.BottomNavigationBar
 import com.example.fitness360.utils.getUserUid
 import com.example.fitness360.network.ApiClient
+import com.example.fitness360.network.EditFoodRequest
 import com.example.fitness360.network.MealService
+import com.example.fitness360.network.RemoveFoodRequest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-data class FoodItem(val name: String, var quantity: Int, val calories: Int, val carbs: Int, val fats: Int, val proteins: Int)
+data class FoodItem(val name: String, var barcode: String, var quantity: Int, val calories: Float, val carbs: Float, val fats: Float, val proteins: Float)
 
 @Composable
 fun MealScreen(navController: NavController) {
@@ -41,7 +46,6 @@ fun MealScreen(navController: NavController) {
 
     var selectedFood by remember { mutableStateOf<FoodItem?>(null) }
 
-    // Cargar cada tipo de comida cuando se crea la pantalla
     LaunchedEffect(uid) {
         uid?.let { userId ->
             // Lista de pares de tipo de comida y su lista correspondiente
@@ -55,16 +59,19 @@ fun MealScreen(navController: NavController) {
             // Iterar sobre cada par y cargar los alimentos
             mealTypes.forEach { (mealType, mealList) ->
                 val response = mealService.getMealWithFoods(userId, mealType)
+                println(response.body());
                 if (response.isSuccessful) {
                     response.body()?.let { foods ->
-                        mealList.addAll(foods.map { food ->
+
+                        mealList.addAll(foods.map { foodWrapper ->
                             FoodItem(
-                                name = food.name,
-                                quantity = food.servingSize,
-                                calories = food.kcals,
-                                carbs = food.carbs,
-                                fats = food.fats,
-                                proteins = food.proteins
+                                barcode = foodWrapper.food.barcode,
+                                name = foodWrapper.food.name ?: "Desconocido",
+                                quantity = foodWrapper.servingSize,
+                                calories = foodWrapper.food.kcals,
+                                carbs = foodWrapper.food.carbs,
+                                fats = foodWrapper.food.fats,
+                                proteins = foodWrapper.food.proteins
                             )
                         })
                     }
@@ -86,7 +93,7 @@ fun MealScreen(navController: NavController) {
             horizontalAlignment = Alignment.Start
         ) {
             // Encabezado
-            Column(modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)) {
+            Column(modifier = Modifier.padding(bottom = 16.dp)) {
                 Text("COMIDAS", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Color(0xFF333333))
                 Text("DIARIAS", fontSize = 22.sp, color = Color(0xFF007ACC), fontWeight = FontWeight.SemiBold)
             }
@@ -104,19 +111,32 @@ fun MealScreen(navController: NavController) {
         BottomNavigationBar(navController = navController)
 
         selectedFood?.let { food ->
-            EditFoodDialog(
-                food = food,
-                onDismiss = { selectedFood = null },
-                onConfirm = { quantity -> updateFoodQuantity(desayuno, almuerzo, merienda, cena, food, quantity) },
-                onDelete = {
-                    desayuno.remove(food)
-                    almuerzo.remove(food)
-                    merienda.remove(food)
-                    cena.remove(food)
-                    selectedFood = null
+            if (uid != null) {
+                val mealType = when {
+                    desayuno.contains(food) -> "breakfast"
+                    almuerzo.contains(food) -> "lunch"
+                    merienda.contains(food) -> "snack"
+                    cena.contains(food) -> "dinner"
+                    else -> ""
                 }
-            )
+
+                EditFoodDialog(
+                    food = food,
+                    uid = uid,
+                    type = mealType, // Pasa el tipo de comida aquí
+                    onDismiss = { selectedFood = null },
+                    onConfirm = { quantity -> updateFoodQuantity(desayuno, almuerzo, merienda, cena, food, quantity) },
+                    onDelete = {
+                        desayuno.remove(food)
+                        almuerzo.remove(food)
+                        merienda.remove(food)
+                        cena.remove(food)
+                        selectedFood = null
+                    }
+                )
+            }
         }
+
     }
 
 
@@ -215,20 +235,74 @@ fun FoodItemRow(food: FoodItem, onClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditFoodDialog(food: FoodItem, onDismiss: () -> Unit, onConfirm: (Int) -> Unit, onDelete: () -> Unit) {
+fun EditFoodDialog(
+    food: FoodItem,
+    uid: String,
+    type: String, // Añadir el tipo de comida aquí
+    onDismiss: () -> Unit,
+    onConfirm: (Int) -> Unit,
+    onDelete: () -> Unit
+) {
     var quantity by remember { mutableStateOf(food.quantity.toString()) }
+    val mealService = ApiClient.retrofit.create(MealService::class.java)
+    val coroutineScope = rememberCoroutineScope()
 
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = {
-                onConfirm(quantity.toIntOrNull() ?: food.quantity)
+                val newQuantity = quantity.toIntOrNull() ?: food.quantity
+                onConfirm(newQuantity)
+
+                coroutineScope.launch {
+                    val editRequest = EditFoodRequest(
+                        barcode = food.barcode,
+                        uid = uid,
+                        type = type, // Usa el tipo de comida aquí
+                        newSize = newQuantity
+                    )
+                    try {
+                        val response = withContext(Dispatchers.IO) {
+                            mealService.editFoodInMeal(editRequest).execute()
+                        }
+
+                        if (!response.isSuccessful) {
+                            println("Error al actualizar en el backend: ${response.errorBody()}")
+                        } else {
+                            println("Actualización exitosa en el backend")
+                            onDismiss()
+                        }
+                    } catch (e: Exception) {
+                        println("Error al realizar la solicitud: ${e.message}")
+                    }
+                }
             }) {
                 Text("Guardar")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDelete) {
+            TextButton(onClick = {
+                coroutineScope.launch {
+                    try {
+                        val response = withContext(Dispatchers.IO) {
+                            mealService.deleteFoodFromMeal(
+                                barcode = food.barcode,
+                                uid = uid,
+                                type = type
+                            ).execute()
+                        }
+                        if (!response.isSuccessful) {
+                            println("Error al eliminar en el backend: ${response.errorBody()}")
+                        } else {
+                            println("Eliminación exitosa en el backend")
+                            onDelete() // Llama a onDelete para eliminar el alimento de la lista local
+                            onDismiss() // Cierra el diálogo
+                        }
+                    } catch (e: Exception) {
+                        println("Error al realizar la solicitud de eliminación: ${e.message}")
+                    }
+                }
+            }) {
                 Text("Eliminar")
             }
         },
@@ -246,6 +320,7 @@ fun EditFoodDialog(food: FoodItem, onDismiss: () -> Unit, onConfirm: (Int) -> Un
         }
     )
 }
+
 
 
 

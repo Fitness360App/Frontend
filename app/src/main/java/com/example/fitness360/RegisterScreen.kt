@@ -241,9 +241,15 @@ fun RegistrationForm(navController: NavController, onRegistrationStart: () -> Un
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 300.dp, start = 24.dp, end = 24.dp)
+            .padding(top = 250.dp, start = 24.dp, end = 24.dp)
     ) {
-        Text("¡ Bienvenido/a !", fontSize = 32.sp, fontWeight = FontWeight.Bold)
+        Text(
+            text = "¡ Bienvenido/a !",
+            fontWeight = FontWeight.Bold,
+            fontSize = 40.sp,
+            modifier = Modifier
+                .padding(bottom = 20.dp)
+        )
 
         CustomOutlinedTextFieldWithValidation(
             label = "Correo Electrónico",
@@ -282,12 +288,21 @@ fun RegistrationForm(navController: NavController, onRegistrationStart: () -> Un
 
         CustomButton(
             text = "Iniciar Registro",
-            onClick = validateForm,
-            padding = PaddingValues(10.dp),
-            fontWeight = FontWeight.SemiBold,
-            width = 200.dp,
-            height = 50.dp
+            onClick = validateForm
         )
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 16.dp)
+        ) {
+            Text("¿Ya tienes cuenta? ")
+            Text(
+                text = "Inicia Sesión",
+                modifier = Modifier.clickable { navController.navigate("login") },
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+            )
+        }
     }
 }
 
@@ -562,6 +577,8 @@ fun CustomOutlinedTextFieldWithValidation(
             errorMessage = validation(it)
             isError = errorMessage != null
         },
+        modifier = Modifier
+            .fillMaxWidth(),
         label = { Text(label, color = if (isError) Color.Red else Color.Gray) },
         isError = isError,
         shape = shape,

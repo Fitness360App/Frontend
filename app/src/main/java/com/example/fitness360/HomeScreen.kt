@@ -71,6 +71,7 @@ import kotlinx.coroutines.delay
 fun HomeScreen(navController: NavController) {
     val context = LocalContext.current
     val uid = getUserUid(context)
+    println(uid)
     var userData by remember { mutableStateOf<UserData?>(null) }
     var dailyRecord by remember { mutableStateOf<DailyRecord?>(null) }
     var loadStatus by remember { mutableStateOf("Cargando...") }
@@ -88,14 +89,16 @@ fun HomeScreen(navController: NavController) {
                     val userResponse = userService.getUserDataByID(it)
                     if (userResponse.isSuccessful) {
                         userData = userResponse.body()
+                        println(userData)
                         loadStatus = "Datos del usuario cargados"
                     } else {
                         loadStatus = "Error al cargar los datos del usuario."
                     }
 
                     // Cargar registro diario
+                    println(uid)
                     val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-                    val recordResponse = dailyRecordService.getDailyRecord(uid, "08/11/2024")
+                    val recordResponse = dailyRecordService.getDailyRecord(uid, currentDate)
                     if (recordResponse.isSuccessful) {
                         dailyRecord = recordResponse.body()
                         loadStatus = "Registro diario cargado"

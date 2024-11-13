@@ -5,6 +5,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Query
 import retrofit2.Response
+import retrofit2.http.Path
 
 
 data class UserDataRequest(val uid: String)
@@ -30,6 +31,6 @@ data class UserData(
 )
 
 interface UserService {
-    @GET("api/users/getUserDataByID")
-    suspend fun getUserDataByID(@Query("uid") userId: String): Response<UserData>
+    @GET("api/users/getUserDataByID/{uid}")
+    suspend fun getUserDataByID(@Path("uid") userId: String): Response<UserData>
 }

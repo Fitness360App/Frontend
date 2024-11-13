@@ -239,7 +239,6 @@ fun AddToMealDialog(
                         onClick = {
                             coroutineScope.launch {
                                 try {
-                                    println("ENTRO DONDE QUIERES")
 
                                     // Ejecutar la solicitud en Dispatchers.IO para operaciones de red
                                     withContext(Dispatchers.IO) {
@@ -248,12 +247,9 @@ fun AddToMealDialog(
                                             uid = uid,
                                             type = selectedMeal.lowercase()
                                         )
-                                        println(request)
-                                        println("ENTRO DONDE QUIERES2")
 
                                         // Realiza la solicitud en segundo plano
                                         val response = mealService.addFoodToMeal(request).execute()
-                                        println(response)
 
                                         withContext(Dispatchers.Main) {
                                             if (response.isSuccessful) {

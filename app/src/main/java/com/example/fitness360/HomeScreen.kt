@@ -95,8 +95,6 @@ fun HomeScreen(navController: NavController) {
                         loadStatus = "Error al cargar los datos del usuario."
                     }
 
-                    // Cargar registro diario
-                    println(uid)
                     val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
                     val recordResponse = dailyRecordService.getDailyRecord(uid, currentDate)
                     if (recordResponse.isSuccessful) {

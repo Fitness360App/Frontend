@@ -55,7 +55,18 @@ import retrofit2.Response
 
 import com.example.fitness360.utils.saveUserUid
 import com.example.fitness360.utils.getUserUid
+import kotlinx.coroutines.CoroutineScope
 
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import DailyRecordRequest
+import DailyRecordService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 @Composable
@@ -127,7 +138,6 @@ fun LoginScreen(navController: NavController) {
             CustomButton(
                 text = "Iniciar Sesión",
                 onClick = {
-
                     val loginRequest = LoginRequest(email, password)
                     val call = authService.login(loginRequest)
 
@@ -141,7 +151,33 @@ fun LoginScreen(navController: NavController) {
                                 val loginResponse = response.body()
                                 if (loginResponse != null) {
                                     saveUserUid(context, loginResponse.uid)
-                                    navController.navigate("home") // Redirige si el login es exitoso
+
+                                    // Formatear la fecha actual
+                                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                    val currentDate = dateFormat.format(Date())
+
+                                    // Instancia del servicio DailyRecordService
+                                    val dailyRecordService = ApiClient.retrofit.create(DailyRecordService::class.java)
+
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        // Comprobar si existe el dailyRecord
+                                        val checkResponse = dailyRecordService.getDailyRecord(loginResponse.uid, currentDate)
+                                        if (!checkResponse.isSuccessful) {
+                                            // Si no existe, crearlo
+                                            val dailyRecordRequest = DailyRecordRequest(
+                                                uid = loginResponse.uid,
+                                                date = currentDate
+                                            )
+                                            dailyRecordService.createDailyRecord(dailyRecordRequest)
+                                        }
+
+                                        // Navegar a Home después de la verificación/creación del registro diario
+                                        withContext(Dispatchers.Main) {
+                                            navController.navigate("home") {
+                                                popUpTo("login") { inclusive = true }
+                                            }
+                                        }
+                                    }
                                 }
                             } else {
                                 loginStatus = "Login fallido. Verifica tus credenciales."
@@ -152,7 +188,6 @@ fun LoginScreen(navController: NavController) {
                             loginStatus = "Error de red: ${t.message}"
                         }
                     })
-
                 }
             )
 

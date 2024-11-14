@@ -5,6 +5,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Query
 import retrofit2.Response
+import retrofit2.http.DELETE
 import retrofit2.http.Path
 
 
@@ -33,4 +34,7 @@ data class UserData(
 interface UserService {
     @GET("api/users/getUserDataByID/{uid}")
     suspend fun getUserDataByID(@Path("uid") userId: String): Response<UserData>
+
+    @DELETE("api/users/deleteUser/{uid}")
+    suspend fun deleteUser(@Path("uid") userId: String): Response<Void>
 }

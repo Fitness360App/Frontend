@@ -139,8 +139,6 @@ fun MealScreen(navController: NavController) {
 
     }
 
-
-
 }
 
 
@@ -214,7 +212,7 @@ fun FoodItemRow(food: FoodItem, onClick: () -> Unit) {
                     color = Color.Gray
                 )
                 Text(
-                    text = "Calorías: ${food.calories} kcal | Carbs: ${food.carbs}g | Grasas: ${food.fats}g | Prot: ${food.proteins}g",
+                    text = "Calorías: ${food.calories*(food.quantity/100f)} kcal | Carbs: ${food.carbs*(food.quantity/100f)}g | Grasas: ${food.fats*(food.quantity/100f)}g | Prot: ${food.proteins*(food.quantity/100f)}g",
                     fontSize = 12.sp,
                     color = Color.Gray
                 )

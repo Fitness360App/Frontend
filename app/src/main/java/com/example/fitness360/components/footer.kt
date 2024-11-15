@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Settings
 
 import androidx.compose.material.icons.rounded.Calculate
 import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.filled.Person
 
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
@@ -70,7 +71,7 @@ fun BottomNavigationBar(navController: NavController) {
             }
             IconButton(onClick = { navController.navigate("settings") }, modifier = Modifier.weight(1f)) {
                 Icon(
-                    imageVector = Icons.Default.Settings,
+                    imageVector = Icons.Default.Person,
                     contentDescription = "Configuración",
                     modifier = Modifier.size(36.dp) // Ajusta el tamaño del icono
                 )

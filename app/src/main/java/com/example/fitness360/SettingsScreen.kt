@@ -35,7 +35,7 @@ fun SettingsScreen(navController: NavController) {
     var loadStatus by remember { mutableStateOf("Cargando...") }
     val userService = ApiClient.retrofit.create(UserService::class.java)
     val coroutineScope = rememberCoroutineScope()
-    var showDeleteDialog by remember { mutableStateOf(false) }
+
 
     // Estados para los campos de configuración del usuario
     var showEditDialog by remember { mutableStateOf(false) }
@@ -157,64 +157,29 @@ fun SettingsScreen(navController: NavController) {
                         .padding(vertical = 8.dp, horizontal = 16.dp)
                 )
 
+
                 Text(
-                    text = "Eliminar Cuenta",
+                    text = "Cerrar Sesión",
                     fontSize = 18.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
-                        .clickable { showDeleteDialog = true }
-                        .background(Color(0xFFEF5350), shape = CircleShape)
+                        .clickable {
+                            clearUserUid(context)
+                            navController.navigate("auth") {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                        .background(Color(0xFF007ACC), shape = CircleShape)
                         .padding(vertical = 8.dp, horizontal = 16.dp)
                 )
+
             }
         }
 
         BottomNavigationBar(navController = navController)
-
-        if (showDeleteDialog) {
-            AlertDialog(
-                onDismissRequest = { showDeleteDialog = false },
-                title = { Text("Confirmar Eliminación") },
-                text = { Text("¿Está seguro de que desea eliminar su cuenta? Esta acción no se puede deshacer.") },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                try {
-                                    val response = uid?.let { userService.deleteUser(it) }
-                                    if (response != null) {
-                                        if (response.isSuccessful) {
-                                            withContext(Dispatchers.Main) {
-                                                clearUserUid(context)
-                                                showDeleteDialog = false
-                                                navController.navigate("auth") {
-                                                    popUpTo(navController.graph.startDestinationId) {
-                                                        inclusive = true
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                } catch (e: Exception) {
-                                    withContext(Dispatchers.Main) {
-                                        var deleteStatus = "Error de red al crear el registro diario: ${e.message}"
-                                    }
-                                }
-                            }
-
-                        }
-                    ) {
-                        Text("Confirmar")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDeleteDialog = false }) {
-                        Text("Cancelar")
-                    }
-                }
-            )
-        }
 
         if (showEditDialog) {
             EditProfileDialog(

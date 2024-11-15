@@ -88,5 +88,20 @@ fun AccountSettingsScreen(navController: NavController) {
                 .background(Color(0xFF007ACC), shape = CircleShape)
                 .padding(vertical = 8.dp, horizontal = 16.dp)
         )
+
+        Text(
+            text = "Cancelar",
+            fontSize = 18.sp,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally) // Centrar el botón horizontalmente
+                .clickable {
+                    navController.popBackStack() // Vuelve a la pantalla anterior
+                }
+                .background(Color(0xFF007ACC), shape = CircleShape)
+                .padding(vertical = 8.dp, horizontal = 16.dp)
+        )
+
     }
 }

@@ -68,4 +68,7 @@ interface MealService {
         @Query("uid") uid: String,
         @Query("type") type: String
     ): Call<Void>
+
+    @POST("api/dailyRecord/updateNutrients/{uid}")
+    fun updateProcess(@Path("uid") uid: String): Call<Void>
 }

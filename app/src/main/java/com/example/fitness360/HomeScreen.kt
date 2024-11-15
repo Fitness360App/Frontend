@@ -248,9 +248,9 @@ fun MultiLayerCircularIndicators(
 
             // Datos de progreso de los nutrientes y tamaños de los anillos
             val progresses = listOf(
-                Pair(carbProgress, 184.dp to Color(0xFF7FB2D0)),
-                Pair(proteinProgress, 152.dp to Color(0xFF3385B4)),
-                Pair(fatProgress, 120.dp to Color(0xFF05476D))
+                Pair(dailyRecord.nutrients.consumedCarbs/userData.carbs, 184.dp to Color(0xFF7FB2D0)),
+                Pair(dailyRecord.nutrients.consumedProteins/userData.proteins, 152.dp to Color(0xFF3385B4)),
+                Pair(dailyRecord.nutrients.consumedFats/userData.fats, 120.dp to Color(0xFF05476D))
             )
 
             // Dibujar cada indicador de progreso
@@ -264,7 +264,7 @@ fun MultiLayerCircularIndicators(
 
             // Indicador central de calorías con relleno
             VerticalFillCircle(
-                fillProgress = kcalsProgress,
+                fillProgress = (dailyRecord.nutrients.consumedKcals - dailyRecord.burnedKcals) / userData.kcals,
                 size = 104.dp, // Tamaño del círculo
                 fillColor = Color(0xFFFFA500), // Color del relleno
                 backgroundColor = Color(0xFFFFFFFF) // Color de fondo
@@ -275,7 +275,7 @@ fun MultiLayerCircularIndicators(
 
             // Texto de porcentaje en el centro
             Text(
-                text = "${(kcalsProgress * 100).toInt()}%",
+                text = "${((dailyRecord.nutrients.consumedKcals - dailyRecord.burnedKcals) / userData.kcals * 100).toInt()}%",
                 color = Color.Black,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,

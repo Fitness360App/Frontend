@@ -267,6 +267,16 @@ fun EditFoodDialog(
                         if (!response.isSuccessful) {
                             println("Error al actualizar en el backend: ${response.errorBody()}")
                         } else {
+
+                            withContext(Dispatchers.IO) {
+                                val updateResponse = mealService.updateProcess(uid).execute()
+                                if (!updateResponse.isSuccessful) {
+                                    println("Error al actualizar el proceso: ${updateResponse.errorBody()}")
+                                } else {
+                                    println("Proceso de actualización exitoso")
+                                }
+                            }
+
                             println("Actualización exitosa en el backend")
                             onDismiss()
                         }
@@ -293,6 +303,16 @@ fun EditFoodDialog(
                             println("Error al eliminar en el backend: ${response.errorBody()}")
                         } else {
                             println("Eliminación exitosa en el backend")
+
+                            withContext(Dispatchers.IO) {
+                                val updateResponse = mealService.updateProcess(uid).execute()
+                                if (!updateResponse.isSuccessful) {
+                                    println("Error al actualizar el proceso: ${updateResponse.errorBody()}")
+                                } else {
+                                    println("Proceso de actualización exitoso")
+                                }
+                            }
+
                             onDelete() // Llama a onDelete para eliminar el alimento de la lista local
                             onDismiss() // Cierra el diálogo
                         }

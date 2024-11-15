@@ -254,9 +254,13 @@ fun AddToMealDialog(
 
                                         withContext(Dispatchers.Main) {
                                             if (response.isSuccessful) {
+                                                // Llama a la función updateProcess tras una adición exitosa
+                                                withContext(Dispatchers.IO) {
+                                                    mealService.updateProcess(uid).execute()
+                                                }
+
                                                 onConfirm(selectedMeal, quantity)
                                             } else {
-                                                // Maneja el error aquí
                                                 println("Error en la respuesta: ${response.errorBody()}")
                                             }
                                         }

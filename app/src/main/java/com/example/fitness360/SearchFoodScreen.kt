@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,6 +60,26 @@ fun SearchFoodScreen(navController: NavController) {
     var noResults by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val uid = getUserUid(context)
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            try {
+                val response = foodService.getFeaturedFoods()
+
+                println(response)
+                if (response.isSuccessful) {
+                    foodResults = response.body() ?: emptyList()
+                } else {
+                    noResults = true
+                }
+            } catch (e: Exception) {
+                noResults = true
+            }
+        }
+    }
+
+
+
 
     Box(
         modifier = Modifier

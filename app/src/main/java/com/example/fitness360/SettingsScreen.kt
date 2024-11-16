@@ -27,6 +27,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+
+fun formatName(name: String): String {
+    return name.trim().lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+}
+
+
 @Composable
 fun SettingsScreen(navController: NavController) {
     val context = LocalContext.current
@@ -101,13 +107,13 @@ fun SettingsScreen(navController: NavController) {
 
                 Column {
                     Text(
-                        text = userName,
+                        text = formatName(userName),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF007ACC)
                     )
                     Text(
-                        text = userLastName,
+                        text = formatName(userLastName),
                         fontSize = 20.sp,
                         color = Color.Gray
                     )

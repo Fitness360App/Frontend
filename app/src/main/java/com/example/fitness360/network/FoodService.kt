@@ -23,4 +23,9 @@ data class Nutrients(
 interface FoodService {
     @GET("api/food/search/name/{name}")
     suspend fun searchFoodByName(@Path("name") name: String): Response<List<Food>>
+
+    @GET("api/food/featured")
+    suspend fun getFeaturedFoods(): Response<List<Food>>
 }
+
+

@@ -28,6 +28,8 @@ import com.example.fitness360.network.ApiClient
 import com.example.fitness360.network.FoodService
 import com.example.fitness360.network.MealService
 
+
+
 @Composable
 fun ProductCard(food: Food, uid: String) {
     var showDialog by remember { mutableStateOf(false) }
@@ -135,6 +137,7 @@ fun ProductCard(food: Food, uid: String) {
             }
         }
 
+        // Aquí, asegúrate de que el diálogo sea independiente
         if (showDialog) {
             AddToMealDialog(
                 foodBarcode = food.barcode,
@@ -146,7 +149,10 @@ fun ProductCard(food: Food, uid: String) {
             )
         }
     }
+
+
 }
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -239,7 +245,6 @@ fun AddToMealDialog(
                         onClick = {
                             coroutineScope.launch {
                                 try {
-                                    println(quantity)
                                     // Ejecutar la solicitud en Dispatchers.IO para operaciones de red
                                     withContext(Dispatchers.IO) {
                                         val request = AddFoodRequest(

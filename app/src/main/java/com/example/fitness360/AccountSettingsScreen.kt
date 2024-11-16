@@ -38,27 +38,49 @@ fun AccountSettingsScreen(navController: NavController) {
             .background(Color.White),
         horizontalAlignment = Alignment.Start
     ) {
-        // Encabezado con padding superior ajustado
-        Column() {
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween, // Espacio entre textos y botón
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Encabezado de la pantalla
+            Column {
+                Text(
+                    text = "CONFIGURAR",
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF333333)
+                )
+                Text(
+                    text = "CUENTA",
+                    fontSize = 22.sp,
+                    color = Color(0xFF007ACC),
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            // Botón "Volver"
             Text(
-                text = "CONFIGURAR",
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF333333)
-            )
-            Text(
-                text = "CUENTA",
-                fontSize = 22.sp,
+                text = "Volver",
+                fontSize = 18.sp,
                 color = Color(0xFF007ACC),
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier
+                    .clickable {
+                        navController.popBackStack() // Navega hacia atrás
+                    }
+                    .padding(horizontal = 8.dp)
             )
         }
 
-        // Campo de correo electrónico
+
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Correo electrónico") },
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Anterior Contraseña") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
@@ -86,46 +108,41 @@ fun AccountSettingsScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Botón estilo "Guardar Cambios"
-        Text(
-            text = "Guardar Cambios",
-            fontSize = 18.sp,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
+        Row(
             modifier = Modifier
-                .align(Alignment.CenterHorizontally) // Centrar el botón horizontalmente
-                .clickable {
-                    // Lógica para guardar el correo y la contraseña actualizados
-                    navController.popBackStack() // Vuelve a la pantalla anterior
-                }
-                .background(Color(0xFF007ACC), shape = CircleShape)
-                .padding(vertical = 8.dp, horizontal = 16.dp)
-        )
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly // Espaciado uniforme entre botones
+        ) {
+            // Botón "Guardar Cambios"
+            Text(
+                text = "Confirmar",
+                fontSize = 18.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .clickable {
+                        // Lógica para guardar el correo y la contraseña actualizados
+                        navController.popBackStack() // Vuelve a la pantalla anterior
+                    }
+                    .background(Color(0xFF007ACC), shape = CircleShape)
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
+            )
 
-        Text(
-            text = "Cancelar",
-            fontSize = 18.sp,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally) // Centrar el botón horizontalmente
-                .clickable {
-                    navController.popBackStack() // Vuelve a la pantalla anterior
-                }
-                .background(Color(0xFF007ACC), shape = CircleShape)
-                .padding(vertical = 8.dp, horizontal = 16.dp)
-        )
+            Text(
+                text = "Eliminar Cuenta",
+                fontSize = 18.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .clickable { showDeleteDialog = true }
+                    .background(Color(0xFFEF5350), shape = CircleShape)
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
+            )
+        }
 
-        Text(
-            text = "Eliminar Cuenta",
-            fontSize = 18.sp,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .clickable { showDeleteDialog = true }
-                .background(Color(0xFFEF5350), shape = CircleShape)
-                .padding(vertical = 8.dp, horizontal = 16.dp)
-        )
+
+
         if (showDeleteDialog) {
             AlertDialog(
                 onDismissRequest = { showDeleteDialog = false },

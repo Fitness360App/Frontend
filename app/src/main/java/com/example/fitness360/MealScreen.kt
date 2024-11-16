@@ -29,6 +29,13 @@ import kotlinx.coroutines.withContext
 
 data class FoodItem(val name: String, var barcode: String, var quantity: Int, val calories: Float, val carbs: Float, val fats: Float, val proteins: Float)
 
+
+fun String.capitalizeWords(): String {
+    return split(" ").joinToString(" ") { word ->
+        word.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+    }
+}
+
 @Composable
 fun MealScreen(navController: NavController) {
 
@@ -66,7 +73,7 @@ fun MealScreen(navController: NavController) {
                         mealList.addAll(foods.map { foodWrapper ->
                             FoodItem(
                                 barcode = foodWrapper.food.barcode,
-                                name = foodWrapper.food.name ?: "Desconocido",
+                                name = foodWrapper.food.name.capitalizeWords(), // Aplica la transformación aquí
                                 quantity = foodWrapper.servingSize,
                                 calories = foodWrapper.food.kcals,
                                 carbs = foodWrapper.food.carbs,
@@ -167,16 +174,41 @@ fun updateFoodQuantity(
 
 @Composable
 fun MealList(mealName: String, foods: List<FoodItem>, onFoodClick: (FoodItem) -> Unit) {
-    Text(
-        text = mealName,
-        fontSize = 22.sp,
-        fontWeight = FontWeight.Bold,
-        color = Color(0xFF007ACC), // Color azul para los títulos de cada comida
-        modifier = Modifier.padding(vertical = 8.dp)
-    )
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp) // Más separación vertical
+    ) {
+        // Título de la comida
+        Text(
+            text = mealName,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF007ACC), // Color azul para los títulos de cada comida
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
 
-    foods.forEach { food ->
-        FoodItemRow(food = food, onClick = { onFoodClick(food) })
+        if (foods.isEmpty()) {
+            // Mostrar un mensaje si la lista está vacía
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp), // Separación adicional
+                contentAlignment = Alignment.Center // Centrar el texto
+            ) {
+                Text(
+                    text = "( No se ha consumido ningún alimento )",
+                    fontSize = 14.sp,
+                    color = Color.Gray, // Color gris para dar énfasis
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        } else {
+            // Mostrar los alimentos si hay elementos en la lista
+            foods.forEach { food ->
+                FoodItemRow(food = food, onClick = { onFoodClick(food) })
+            }
+        }
     }
 }
 

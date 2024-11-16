@@ -5,6 +5,8 @@ import DailyRecordService
 import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -30,6 +32,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import com.example.fitness360.network.ApiClient
 import com.example.fitness360.network.AuthService
 import com.example.fitness360.network.LoginResponse
@@ -175,6 +178,8 @@ fun RegisterScreen(navController: NavController) {
         }
     }
 }
+
+
 
 // Pantalla inicial de formulario de registro
 @Composable
@@ -466,16 +471,26 @@ fun StepActivityInfo(onNext: () -> Unit, onPrevious: () -> Unit) {
     val activityLevelOptions = listOf("Sedentario", "Ligero", "Moderado", "Activo", "Muy Activo")
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
-        Text(text = "Género", fontSize = 16.sp, modifier = Modifier.padding(vertical = 8.dp))
-        Box {
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = Color.Gray,
+                    shape = RoundedCornerShape(30.dp)
+                )
+                .background(Color.White) // Fondo blanco para contraste
+                .clickable { expandedGender = true } // Detectar clic para desplegar menú
+                .padding(16.dp)
+        ) {
             Text(
                 text = if (selectedGender.isEmpty()) "Seleccione género" else selectedGender,
-                modifier = Modifier
-                    .clickable { expandedGender = true }
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                color = if (selectedGender.isEmpty()) Color.Gray else Color.Black
+                color = if (selectedGender.isEmpty()) Color.Gray else Color.Black,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start // Alineación a la izquierda
             )
+
             DropdownMenu(expanded = expandedGender, onDismissRequest = { expandedGender = false }) {
                 genderOptions.forEach { genderOption ->
                     DropdownMenuItem(
@@ -490,15 +505,27 @@ fun StepActivityInfo(onNext: () -> Unit, onPrevious: () -> Unit) {
             }
         }
 
-        Text(text = "Nivel de Actividad", fontSize = 16.sp, modifier = Modifier.padding(vertical = 8.dp))
-        Box {
+        Spacer(modifier = Modifier.height(16.dp))
+
+
+
+        Box (
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = Color.Gray,
+                    shape = RoundedCornerShape(30.dp)
+                )
+                .background(Color.White) // Fondo blanco para contraste
+                .clickable { expandedActivityLevel = true } // Detectar clic para desplegar menú
+                .padding(16.dp)
+        ){
             Text(
                 text = if (selectedActivityLevel.isEmpty()) "Seleccione nivel de actividad" else selectedActivityLevel,
-                modifier = Modifier
-                    .clickable { expandedActivityLevel = true }
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                color = if (selectedActivityLevel.isEmpty()) Color.Gray else Color.Black
+                color = if (selectedGender.isEmpty()) Color.Gray else Color.Black,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start
             )
             DropdownMenu(expanded = expandedActivityLevel, onDismissRequest = { expandedActivityLevel = false }) {
                 activityLevelOptions.forEach { level ->
@@ -519,6 +546,7 @@ fun StepActivityInfo(onNext: () -> Unit, onPrevious: () -> Unit) {
 }
 
 
+
 // Paso 4: Confirmación
 @Composable
 fun StepConfirmation(navController: NavController, onPrevious: () -> Unit, onFinalizar: () -> Unit) {
@@ -526,31 +554,30 @@ fun StepConfirmation(navController: NavController, onPrevious: () -> Unit, onFin
     Text("¡Registro completo!", fontSize = 24.sp, fontWeight = FontWeight.Bold)
     Box(
         modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth()
-            .padding(bottom = 32.dp),
+            .fillMaxSize()
+            .padding(bottom = 16.dp), // Ajusta esta distancia según sea necesario
         contentAlignment = Alignment.BottomCenter
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp), // Espacio entre botones
-            modifier = Modifier.fillMaxWidth() // Ocupa todo el ancho de la fila
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp) // Espaciado lateral
         ) {
             CustomButton(
                 text = "Anterior",
                 onClick = onPrevious,
                 padding = PaddingValues(10.dp),
                 fontWeight = FontWeight.SemiBold,
-                width = 150.dp, // Anchura personalizada
-                height = 50.dp // Altura personalizada
+                width = 140.dp,
+                height = 50.dp
             )
 
             CustomButton(
                 text = "Finalizar",
-                onClick = onFinalizar, // Aquí llamamos a onFinalizar
+                onClick = onFinalizar,
                 padding = PaddingValues(10.dp),
                 fontWeight = FontWeight.SemiBold,
-                width = 150.dp, // Anchura personalizada
-                height = 50.dp // Altura personalizada
+                width = 150.dp,
+                height = 50.dp
             )
         }
     }
@@ -608,27 +635,34 @@ fun CustomOutlinedTextFieldWithValidation(
 // Botones de navegación entre pasos
 @Composable
 fun StepNavigationButtons(onNext: () -> Unit, onPrevious: () -> Unit) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 16.dp), // Ajusta esta distancia según sea necesario
+        contentAlignment = Alignment.BottomCenter
     ) {
-        CustomButton(
-            text = "Anterior",
-            onClick = onPrevious,
-            padding = PaddingValues(10.dp),
-            fontWeight = FontWeight.SemiBold,
-            width = 150.dp,
-            height = 50.dp
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp) // Espaciado lateral
+        ) {
+            CustomButton(
+                text = "Anterior",
+                onClick = onPrevious,
+                padding = PaddingValues(10.dp),
+                fontWeight = FontWeight.SemiBold,
+                width = 140.dp,
+                height = 50.dp
+            )
 
-        CustomButton(
-            text = "Siguiente",
-            onClick = onNext,
-            padding = PaddingValues(10.dp),
-            fontWeight = FontWeight.SemiBold,
-            width = 150.dp,
-            height = 50.dp
-        )
+            CustomButton(
+                text = "Siguiente",
+                onClick = onNext,
+                padding = PaddingValues(10.dp),
+                fontWeight = FontWeight.SemiBold,
+                width = 150.dp,
+                height = 50.dp
+            )
+        }
     }
 }
 

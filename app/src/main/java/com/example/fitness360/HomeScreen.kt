@@ -134,7 +134,7 @@ fun HomeScreen(navController: NavController) {
                     color = Color.Black
                 )
                 Text(
-                    text = userData?.name ?: "Cargando...",
+                    text = userData?.name?.lowercase()?.replaceFirstChar { it.uppercase() } ?: "Cargando...",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF0066A1)
@@ -159,11 +159,14 @@ fun HomeScreen(navController: NavController) {
 
             // Mostrar resumen de actividad si dailyRecord tiene datos
             dailyRecord?.let { record ->
-                ActivitySummary(
-                    steps = record.steps.toInt(),
-                    burnedKcals = record.burnedKcals.toInt(),
-                    consumedKcals = record.nutrients.consumedKcals.toInt()
-                )
+                userData?.kcals?.let {
+                    ActivitySummary(
+                        steps = record.steps.toInt(),
+                        burnedKcals = record.burnedKcals.toInt(),
+                        consumedKcals = record.nutrients.consumedKcals.toInt(),
+                        totalKcals = it.toInt()
+                    )
+                }
             }
         }
 
@@ -226,9 +229,9 @@ fun MultiLayerCircularIndicators(
 
         // Datos de nutrientes, usando los valores de dailyRecord
         val nutrients = listOf(
-            Triple("Carbohidratos", "${dailyRecord.nutrients.consumedCarbs}/${userData.carbs}gr", Color(0xFF7FB2D0)),
-            Triple("Proteínas", "${dailyRecord.nutrients.consumedProteins}/${userData.proteins}gr", Color(0xFF3385B4)),
-            Triple("Grasas", "${dailyRecord.nutrients.consumedFats}/${userData.fats}gr", Color(0xFF05476D))
+            Triple("Carbohidratos", "${dailyRecord.nutrients.consumedCarbs.toInt()}/${userData.carbs}gr", Color(0xFF7FB2D0)),
+            Triple("Proteínas", "${dailyRecord.nutrients.consumedProteins.toInt()}/${userData.proteins}gr", Color(0xFF3385B4)),
+            Triple("Grasas", "${dailyRecord.nutrients.consumedFats.toInt()}/${userData.fats}gr", Color(0xFF05476D))
         )
 
         Column(horizontalAlignment = Alignment.Start) {
@@ -330,7 +333,7 @@ fun NutrientInfo(name: String, value: String, color: Color) {
 
 
 @Composable
-fun ActivitySummary(steps: Int, burnedKcals: Int, consumedKcals: Int) {
+fun ActivitySummary(steps: Int, burnedKcals: Int, consumedKcals: Int, totalKcals: Int) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

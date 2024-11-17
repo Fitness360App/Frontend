@@ -48,26 +48,46 @@ fun AccountSettingsScreen(navController: NavController) {
         horizontalAlignment = Alignment.Start
     ) {
         // Encabezado
-        Text(
-            text = "CONFIGURAR CUENTA",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF333333)
-        )
 
-        Text(
-            text = "Volver",
-            fontSize = 18.sp,
-            color = Color(0xFF007ACC),
-            fontWeight = FontWeight.SemiBold,
+        Row (
             modifier = Modifier
-                .clickable {
-                    navController.popBackStack() // Navega hacia atrás
-                    //volver a settingsScreen
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Column {
+                Text(
+                    text = "CONFIGURAR",
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF333333)
+                )
+                Text(
+                    text = "CUENTA",
+                    fontSize = 22.sp,
+                    color = Color(0xFF007ACC),
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
 
-                }
-                .padding(horizontal = 8.dp)
-        )
+            Text(
+                text = "Volver",
+                fontSize = 18.sp,
+                color = Color(0xFF007ACC),
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier
+                    .clickable {
+                        navController.popBackStack() // Navega hacia atrás
+                        //volver a settingsScreen
+
+                    }
+                    .padding(horizontal = 8.dp)
+            )
+        }
+
+
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -102,45 +122,54 @@ fun AccountSettingsScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(
-                onClick = {
-                    if (newPassword != confirmPassword) {
-                        errorMessage = "Las contraseñas no coinciden"
-                    } else if (newPassword.isEmpty()) {
-                        errorMessage = "Todos los campos son obligatorios"
-                    } else if (validatePassword(newPassword) != null) {
-                        errorMessage = validatePassword(newPassword)
-                    }
-                    else {
-                        errorMessage = null
-                        showVerificationDialog = true
-                        CoroutineScope(Dispatchers.IO).launch {
-                            try {
-                                val request = UserSendEmailRequest(
-                                    uid = uid ?: "",
-                                    password = newPassword,
-                                    oldpassword = currentPassword
-                                )
-                                val response = userService.sendEmailConfirmation(request)
-                                println(response.body())
-                                println(response)
 
-                                receiveCode = response.body().toString()
-                                println("Código de verificación: $receiveCode")
-                                if (response.isSuccessful) {
-                                    verificationMessage = "Se ha enviado un correo de verificación a su correo electrónico"
-                                } else {
-                                    verificationMessage = "No se pudo enviar el correo de verificación"
+
+            Text (
+                text = "Guardar Cambios",
+                fontSize = 18.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .clickable {
+                        if (newPassword != confirmPassword) {
+                            errorMessage = "Las contraseñas no coinciden"
+                        } else if (newPassword.isEmpty()) {
+                            errorMessage = "Todos los campos son obligatorios"
+                        } else if (validatePassword(newPassword) != null) {
+                            errorMessage = validatePassword(newPassword)
+                        }
+                        else {
+                            errorMessage = null
+                            showVerificationDialog = true
+                            CoroutineScope(Dispatchers.IO).launch {
+                                try {
+                                    val request = UserSendEmailRequest(
+                                        uid = uid ?: "",
+                                        password = newPassword,
+                                        oldpassword = currentPassword
+                                    )
+                                    val response = userService.sendEmailConfirmation(request)
+                                    println(response.body())
+                                    println(response)
+
+                                    receiveCode = response.body().toString()
+                                    println("Código de verificación: $receiveCode")
+                                    if (response.isSuccessful) {
+                                        verificationMessage = "Se ha enviado un correo de verificación a su correo electrónico"
+                                    } else {
+                                        verificationMessage = "No se pudo enviar el correo de verificación"
+                                    }
+                                } catch (e: Exception) {
+                                    verificationMessage = "Error al enviar el correo: ${e.message}"
                                 }
-                            } catch (e: Exception) {
-                                verificationMessage = "Error al enviar el correo: ${e.message}"
                             }
                         }
+
                     }
-                }
-            ) {
-                Text("Guardar Cambios")
-            }
+                    .background(Color(0xFF007ACC), shape = CircleShape)
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
+            )
+
 
             Text(
                 text = "Eliminar Cuenta",
@@ -149,7 +178,7 @@ fun AccountSettingsScreen(navController: NavController) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .clickable { showDeleteDialog = true }
-                    .background(Color(0xFFFF3A36), shape = CircleShape)
+                    .background(Color(0xFFEF5350), shape = CircleShape)
                     .padding(vertical = 8.dp, horizontal = 16.dp)
             )
         }

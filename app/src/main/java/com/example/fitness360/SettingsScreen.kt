@@ -23,9 +23,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.example.fitness360.network.UserData
 import com.example.fitness360.utils.clearUserUid
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.example.fitness360.network.UserDataForModification
+import com.example.fitness360.network.UserGoalsForModification
+import com.example.fitness360.utils.calculateMacros
 
 
 fun formatName(name: String): String {
@@ -198,19 +200,69 @@ fun SettingsScreen(navController: NavController) {
                 activityLevel = activityLevel,
                 language = language,
                 onDismiss = { showEditDialog = false },
-                onSave = { newName, newLastName, newCurrentWeight, newTargetWeight, newHeight, newAge, newActivityLevel, newLanguage ->
-                    userName = newName
-                    userLastName = newLastName
-                    currentWeight = newCurrentWeight
-                    targetWeight = newTargetWeight
-                    height = newHeight
-                    age = newAge
-                    activityLevel = newActivityLevel
-                    language = newLanguage
-                    showEditDialog = false
+                onSave = { newName, newLastName, newCurrentWeight, newTargetWeight, newHeight, newAge, newActivityLevel ->
+
+                    // Calcular los macros
+                    val macros = calculateMacros(
+                        weight = newCurrentWeight.toFloat().toInt(),
+                        height = newHeight.toFloat().toInt(),
+                        age = newAge.toFloat().toInt(),
+                        gender = "Hombre", // Asegúrate de que el género esté definido correctamente
+                        activityLevel = newActivityLevel
+                    )
+                    val macros2 = uid?.let { UserGoalsForModification(it, macros.proteins, macros.carbs, macros.fats, macros.kcals) }
+
+                    println(macros2)
+                    coroutineScope.launch {
+                        try {
+                            // Crear datos de usuario actualizados
+                            val updatedData = uid?.let {
+                                UserDataForModification(
+                                    uid = it,
+                                    name = newName,
+                                    lastName1 = newLastName,
+                                    actualWeight = newCurrentWeight.toFloat(),
+                                    goalWeight = newTargetWeight.toFloat(),
+                                    height = newHeight.toFloat(),
+                                    age = newAge.toInt(),
+                                    activityLevel = newActivityLevel
+                                )
+                            }
+
+                            // Hacer ambas llamadas al backend
+                            val response1 = updatedData?.let { userService.modifyUserData(it) }
+                            val response2 = macros2?.let { userService.modifyUserGoals(it) }
+
+                            println(response2)
+
+                            withContext(Dispatchers.Main) {
+                                if (response2 != null) {
+                                    if (response1 != null && response1.isSuccessful && response2.isSuccessful) {
+                                        // Actualizar los datos locales después de la modificación
+                                        userName = newName
+                                        userLastName = newLastName
+                                        currentWeight = newCurrentWeight
+                                        targetWeight = newTargetWeight
+                                        height = newHeight
+                                        age = newAge
+                                        activityLevel = newActivityLevel
+                                        showEditDialog = false
+                                    } else {
+                                        // Manejar errores en cualquiera de las respuestas
+                                        println("Error al modificar los datos: ${response1?.message() ?: "Desconocido"}")
+                                        println("Error al modificar los objetivos: ${response2.message()}")
+                                    }
+                                }
+                            }
+                        } catch (e: Exception) {
+                            // Manejar errores de red u otros errores
+                            println("Error de red: ${e.message}")
+                        }
+                    }
                 }
             )
         }
+
     }
 }
 
@@ -251,7 +303,7 @@ fun EditProfileDialog(
     activityLevel: String,
     language: String,
     onDismiss: () -> Unit,
-    onSave: (String, String, String, String, String, String, String, String) -> Unit
+    onSave: (String, String, String, String, String, String, String) -> Unit
 ) {
     var name by remember { mutableStateOf(userName) }
     var lastName by remember { mutableStateOf(userLastName) }
@@ -263,7 +315,7 @@ fun EditProfileDialog(
     var userLanguage by remember { mutableStateOf(language) }
 
     // Opciones para el nivel de actividad y el idioma
-    val activityOptions = listOf("Bajo", "Medio", "Alto")
+    val activityOptions = listOf("Sedentario", "Ligera", "Moderada", "Alta")
     val languageOptions = listOf("Español (ES)", "Inglés (EN)")
 
     AlertDialog(
@@ -316,6 +368,18 @@ fun EditProfileDialog(
                     }
 
                     item {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            OutlinedTextField(
+                                value = userAge,
+                                onValueChange = { userAge = it.filter { char -> char.isDigit() } }, // Solo números
+                                label = { Text("Edad") },
+                                modifier = Modifier.weight(1f)
+                            )
+                            Text(" años", fontSize = 16.sp, modifier = Modifier.padding(start = 8.dp))
+                        }
+                    }
+
+                    item {
                         DropdownSelector(
                             label = "Nivel de Actividad",
                             options = activityOptions,
@@ -336,7 +400,9 @@ fun EditProfileDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSave(name, lastName, weight, goalWeight, userHeight, userAge, activity, userLanguage) }) {
+            TextButton(onClick = {
+
+                onSave(name, lastName, weight, goalWeight, userHeight, userAge, activity) }) {
                 Text("Guardar")
             }
         },

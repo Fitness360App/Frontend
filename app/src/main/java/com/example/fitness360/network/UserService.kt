@@ -86,4 +86,5 @@ interface UserService {
     @PUT("api/users/modifyUserGoals")
     suspend fun modifyUserGoals(@Body updatedGoals: UserGoalsForModification): Response<Void>
 
+
 }

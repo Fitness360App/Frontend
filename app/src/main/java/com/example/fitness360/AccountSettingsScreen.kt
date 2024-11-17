@@ -17,6 +17,7 @@ import com.example.fitness360.network.ApiClient
 import com.example.fitness360.network.UserChangePasswordRequest
 import com.example.fitness360.network.UserSendEmailRequest
 import com.example.fitness360.network.UserService
+import com.example.fitness360.utils.StepCounterViewModel
 import com.example.fitness360.utils.clearUserUid
 import com.example.fitness360.utils.getUserUid
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +27,8 @@ import kotlinx.coroutines.withContext
 import com.example.fitness360.utils.validatePassword
 
 @Composable
-fun AccountSettingsScreen(navController: NavController) {
+fun AccountSettingsScreen(navController: NavController, viewModel: StepCounterViewModel) {
+    val steps by viewModel.steps.collectAsState()
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }

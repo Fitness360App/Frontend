@@ -39,6 +39,7 @@ import com.example.fitness360.network.LoginResponse
 import com.example.fitness360.network.Macros
 import com.example.fitness360.network.RegisterRequest
 import com.example.fitness360.network.RegisterResponse
+import com.example.fitness360.network.UserService
 import com.example.fitness360.utils.saveUserUid
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -225,6 +226,9 @@ fun RegistrationForm(navController: NavController, onRegistrationStart: () -> Un
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
     var confirmPasswordError by remember { mutableStateOf<String?>(null) }
+    var generalError by remember { mutableStateOf<String?>(null) }
+    val userService = ApiClient.retrofit.create(UserService::class.java)
+
 
     val validateForm = {
         emailError = validateMail(emailField) ?: if (emailField.isBlank()) "Este campo no puede estar vacío" else null
@@ -236,9 +240,28 @@ fun RegistrationForm(navController: NavController, onRegistrationStart: () -> Un
         }
 
         if (emailError == null && passwordError == null && confirmPasswordError == null) {
-            email = emailField
-            password = passwordField
-            onRegistrationStart()
+            CoroutineScope(Dispatchers.IO).launch  {
+                try {
+                    // Llamada a la API para verificar el correo
+                    val response = userService.checkUserEmail(emailField)
+                    if (response.isSuccessful) {
+                        val isEmailTaken = response.body() ?: false
+                        if (isEmailTaken) {
+                            emailError = "El correo ya está registrado"
+                        } else {
+                            generalError = null
+                            email = emailField
+                            password = passwordField
+                            onRegistrationStart()
+                        }
+                    } else {
+                        generalError = "Error al verificar el correo. Inténtalo nuevamente."
+                    }
+                } catch (e: Exception) {
+                    generalError = "Error al verificar el correo: ${e.message}"
+                }
+            }
+
         }
     }
 

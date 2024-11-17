@@ -27,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.example.fitness360.network.UserDataForModification
 import com.example.fitness360.network.UserGoalsForModification
+import com.example.fitness360.utils.StepCounterViewModel
 import com.example.fitness360.utils.calculateMacros
 
 
@@ -36,7 +37,8 @@ fun formatName(name: String): String {
 
 
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(navController: NavController, viewModel: StepCounterViewModel) {
+    val steps by viewModel.steps.collectAsState()
     val context = LocalContext.current
     val uid = getUserUid(context)
     var userData by remember { mutableStateOf<UserData?>(null) }

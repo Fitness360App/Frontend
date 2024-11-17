@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,12 +48,14 @@ import com.example.fitness360.components.BottomNavigationBar
 import com.example.fitness360.components.ProductCard
 import com.example.fitness360.network.Food
 import com.example.fitness360.network.FoodService
+import com.example.fitness360.utils.StepCounterViewModel
 import com.example.fitness360.utils.getUserUid
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchFoodScreen(navController: NavController) {
+fun SearchFoodScreen(navController: NavController, viewModel: StepCounterViewModel) {
+    val steps by viewModel.steps.collectAsState()
     val foodService = ApiClient.retrofit.create(FoodService::class.java)
     var searchQuery by remember { mutableStateOf("") }
     var foodResults by remember { mutableStateOf<List<Food>>(emptyList()) }

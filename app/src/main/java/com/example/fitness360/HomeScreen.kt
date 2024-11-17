@@ -54,6 +54,7 @@ import com.example.fitness360.network.ApiClient
 
 import com.example.fitness360.network.UserDataRequest
 import com.example.fitness360.network.UserService
+import com.example.fitness360.utils.StepCounterViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -68,10 +69,11 @@ import java.util.Locale
 import kotlinx.coroutines.delay
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, viewModel: StepCounterViewModel) {
+    val stepsState by viewModel.steps.collectAsState()
     val context = LocalContext.current
     val uid = getUserUid(context)
-    println(uid)
+
     var userData by remember { mutableStateOf<UserData?>(null) }
     var dailyRecord by remember { mutableStateOf<DailyRecord?>(null) }
     var loadStatus by remember { mutableStateOf("Cargando...") }
@@ -226,7 +228,7 @@ fun MultiLayerCircularIndicators(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(start = 16.dp)
     ) {
-
+        println(dailyRecord.nutrients)
         // Datos de nutrientes, usando los valores de dailyRecord
         val nutrients = listOf(
             Triple("Carbohidratos", "${dailyRecord.nutrients.consumedCarbs.toInt()}/${userData.carbs}gr", Color(0xFF7FB2D0)),

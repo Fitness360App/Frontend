@@ -4,10 +4,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
-    private const val BASE_URL = "http://10.0.2.2:3000" // Cambia a 10.0.2.2 si usas un emulador
+    private const val BASE_URL = "http://10.0.2.2:3000" // Cambiar la linea 10 por esta variable
 
     val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl("http://192.168.1.100:3000/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 }

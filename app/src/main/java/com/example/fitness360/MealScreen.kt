@@ -23,6 +23,7 @@ import com.example.fitness360.network.ApiClient
 import com.example.fitness360.network.EditFoodRequest
 import com.example.fitness360.network.MealService
 import com.example.fitness360.network.RemoveFoodRequest
+import com.example.fitness360.utils.StepCounterViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -37,7 +38,8 @@ fun String.capitalizeWords(): String {
 }
 
 @Composable
-fun MealScreen(navController: NavController) {
+fun MealScreen(navController: NavController, viewModel: StepCounterViewModel) {
+    val steps by viewModel.steps.collectAsState()
 
 
     val context = LocalContext.current

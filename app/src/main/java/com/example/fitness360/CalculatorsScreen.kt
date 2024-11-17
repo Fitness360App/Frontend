@@ -20,11 +20,13 @@ import com.example.fitness360.network.UserData
 import com.example.fitness360.network.UserService
 import androidx.compose.ui.platform.LocalContext
 import com.example.fitness360.network.CalculatorService
+import com.example.fitness360.utils.StepCounterViewModel
 import com.example.fitness360.utils.getUserUid
 import kotlinx.coroutines.launch
 
 @Composable
-fun CalculatorsScreen(navController: NavController) {
+fun CalculatorsScreen(navController: NavController, viewModel: StepCounterViewModel) {
+    val steps by viewModel.steps.collectAsState()
     val context = LocalContext.current
     val uid = getUserUid(context)
     var userData by remember { mutableStateOf<UserData?>(null) }

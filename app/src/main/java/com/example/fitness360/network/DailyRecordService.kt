@@ -2,6 +2,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -26,6 +27,12 @@ data class DailyRecordRequest(
     val date: String
 )
 
+data class UpdateStepsRequest(
+    val uid: String,
+    val date: String,
+    val steps: Int
+)
+
 interface DailyRecordService {
     @GET("api/dailyRecord/getDailyRecord/{uid}/{date}")
     suspend fun getDailyRecord(
@@ -37,4 +44,14 @@ interface DailyRecordService {
     suspend fun createDailyRecord(
         @Body request: DailyRecordRequest
     ): Response<Void> // Usa `Void` si no necesitas datos en la respuesta, solo el código de estado
+
+    @PUT("api/dailyRecord/updateSteps")
+    suspend fun updateSteps(
+        @Body request: UpdateStepsRequest
+    ): Response<Void>
+
+    @PUT("api/dailyRecord/updateBurnedKcalsFromSteps")
+    suspend fun updateBurnedKcalsFromSteps(
+        @Body request: UpdateStepsRequest
+    ): Response<Void>
 }

@@ -1,6 +1,7 @@
 package com.example.fitness360
 
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,12 +27,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,19 +39,29 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.example.fitness360.network.ApiClient
 import androidx.compose.ui.platform.LocalContext
+import com.example.fitness360.components.BarcodeScanner
 
 
 import com.example.fitness360.components.BottomNavigationBar
 import com.example.fitness360.components.ProductCard
 import com.example.fitness360.network.Food
 import com.example.fitness360.network.FoodService
+import com.example.fitness360.network.UserSendEmailRequest
 import com.example.fitness360.utils.StepCounterViewModel
 import com.example.fitness360.utils.getUserUid
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchFoodScreen(navController: NavController, viewModel: StepCounterViewModel) {
+fun SearchFoodScreen(
+    navController: NavController,
+    viewModel: StepCounterViewModel,
+    cameraExecutor: ExecutorService, ) {
     val steps by viewModel.steps.collectAsState()
     val foodService = ApiClient.retrofit.create(FoodService::class.java)
     var searchQuery by remember { mutableStateOf("") }
@@ -63,13 +70,14 @@ fun SearchFoodScreen(navController: NavController, viewModel: StepCounterViewMod
     var noResults by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val uid = getUserUid(context)
+    var showBarcodeScanner by remember { mutableStateOf(false) }
+    var scannedBarcode by remember { mutableStateOf("") }
+    var isCameraOpen by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             try {
                 val response = foodService.getFeaturedFoods()
-
-                println(response)
                 if (response.isSuccessful) {
                     foodResults = response.body() ?: emptyList()
                 } else {
@@ -121,7 +129,6 @@ fun SearchFoodScreen(navController: NavController, viewModel: StepCounterViewMod
                                     coroutineScope.launch {
                                         try {
                                             val response = foodService.searchFoodByName(searchQuery)
-                                            println(response);
                                             if (response.isSuccessful) {
                                                 foodResults = response.body() ?: emptyList()
                                                 noResults = foodResults.isEmpty()
@@ -161,9 +168,34 @@ fun SearchFoodScreen(navController: NavController, viewModel: StepCounterViewMod
                         modifier = Modifier
                             .size(24.dp)
                             .clickable {
-                                // Aquí se podría implementar la funcionalidad de escaneo
+                                showBarcodeScanner = true
+                                isCameraOpen = true // Activar el escáner
                             }
                     )
+                }
+            }
+
+            if (showBarcodeScanner) {
+                BarcodeScanner(
+                    cameraExecutor = Executors.newSingleThreadExecutor(),
+                    isCameraOpenSearch = isCameraOpen,
+                    navController,
+                    onBarcodeScanned = { barcode ->
+                        scannedBarcode = barcode
+                        // Aquí se cierra la cámara o se navega a otro estado, si es necesario
+                        isCameraOpen = false
+                    }
+                )
+                if (!isCameraOpen){
+                    showBarcodeScanner = false
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val response = foodService.searchFoodByBarcode(scannedBarcode)
+                            foodResults = listOf(response.body()!!)
+                        } catch (e: Exception) {
+                            println("Error: $e")
+                        }
+                    }
                 }
             }
 

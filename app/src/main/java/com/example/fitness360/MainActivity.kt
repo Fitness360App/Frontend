@@ -6,21 +6,15 @@ import android.Manifest
 import android.app.Application
 import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -28,6 +22,8 @@ import com.example.fitness360.ui.theme.Fitness360Theme
 import com.example.fitness360.utils.StepCounterViewModel
 import com.example.fitness360.utils.StepCounterViewModelFactory
 import com.example.fitness360.utils.getUserUid
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +64,8 @@ fun MainScreen() {
     val context = LocalContext.current
     val uid = getUserUid(context)
     println("UID: $uid")
+    lateinit var cameraExecutor: ExecutorService
+    cameraExecutor = Executors.newSingleThreadExecutor()
 
     val stepCounterViewModel: StepCounterViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
         factory = uid?.let {
@@ -85,7 +83,7 @@ fun MainScreen() {
         composable("login") { LoginScreen(navController) }
         composable("register") { RegisterScreen(navController) }
         composable("home") { HomeScreen(navController, viewModel = stepCounterViewModel) }
-        composable("search") { SearchFoodScreen(navController, viewModel = stepCounterViewModel) }
+        composable("search") { SearchFoodScreen(navController, viewModel = stepCounterViewModel, cameraExecutor) }
         composable("calculators") { CalculatorsScreen(navController, viewModel = stepCounterViewModel) }
         composable("meal") { MealScreen(navController, viewModel = stepCounterViewModel) }
         composable("settings") { SettingsScreen(navController, viewModel = stepCounterViewModel) }

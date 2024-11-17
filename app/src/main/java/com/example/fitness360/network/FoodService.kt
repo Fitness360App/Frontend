@@ -26,6 +26,9 @@ interface FoodService {
 
     @GET("api/food/featured")
     suspend fun getFeaturedFoods(): Response<List<Food>>
+
+    @GET("api/food/search/{barcode}")
+    suspend fun searchFoodByBarcode(@Path("barcode") barcode: String): Response<Food>
 }
 
 

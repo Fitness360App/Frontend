@@ -122,12 +122,12 @@ fun ForgotPasswordScreen(navController: NavController) {
         // Botones
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.Center
         ) {
 
 
             Text (
-                text = "Guardar Cambios",
+                text = "Cambiar Contraseña",
                 fontSize = 18.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,

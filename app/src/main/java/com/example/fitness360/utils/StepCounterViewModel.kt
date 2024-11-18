@@ -8,10 +8,9 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
 import com.example.fitness360.network.ApiClient
-import com.example.fitness360.network.UserSendEmailRequest
-import com.example.fitness360.network.UserService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,19 +21,21 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class StepCounterViewModel(application: Application, private val uid: String) : AndroidViewModel(application), SensorEventListener {
+class StepCounterViewModel(application: Application, context: Context) : AndroidViewModel(application), SensorEventListener {
 
     private val _steps = MutableStateFlow(0)
     private var accumulatedSteps = 0
     val steps: StateFlow<Int> = _steps.asStateFlow()
     private var isDone = true
+    private var uid: String? = null // uid comienza como null
+    private val appContext: Context = context
 
-    fun getUid(): String = uid
 
     private var sensorManager: SensorManager? = null
     private var stepSensor: Sensor? = null
 
     init {
+
         sensorManager = application.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
@@ -49,7 +50,9 @@ class StepCounterViewModel(application: Application, private val uid: String) : 
 
             _steps.value = -1  // Valor para indicar que el sensor no está disponible
         }
+        uid = getUserUid(appContext)
     }
+
 
     override fun onSensorChanged(event: SensorEvent?) {
 
@@ -65,34 +68,40 @@ class StepCounterViewModel(application: Application, private val uid: String) : 
 
                 // Incrementa el acumulador
                 accumulatedSteps += stepsSinceLastUpdate
-
-                println("UID: $uid, Pasos acumulados: $accumulatedSteps")
+                println("Pasos acumulados: $accumulatedSteps")
 
                 // Si se alcanzan 100 pasos, llama a la API
                 if (accumulatedSteps >= 100 && isDone) {
-                    // Llama a la API
-                    isDone=false
-                    CoroutineScope(Dispatchers.IO).launch {
-                        try {
-                            val dailyRecordService = ApiClient.retrofit.create(DailyRecordService::class.java)
-                            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                            val currentDate = dateFormat.format(Date())
-                            val request = UpdateStepsRequest(
-                                uid = uid ?: "",
-                                date = currentDate,
-                                steps = 100
-                            )
-                            val response = dailyRecordService.updateSteps(request)
-                            val response2 = dailyRecordService.updateBurnedKcalsFromSteps(request)
-                            println(response2)
-                            println(response)
-                            accumulatedSteps = 0
-                            isDone=true
-                        } catch (e: Exception) {
-                            println("Error en actualizar los pasos: ${e.message}")
+                    uid = getUserUid(appContext)
+                    println("uid: $uid")
+                    if (uid!=null) {
+                        // Llama a la API
+                        isDone = false
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                val dailyRecordService =
+                                    ApiClient.retrofit.create(DailyRecordService::class.java)
+                                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                val currentDate = dateFormat.format(Date())
+                                val request = UpdateStepsRequest(
+                                    uid = uid ?: "",
+                                    date = currentDate,
+                                    steps = 100
+                                )
+                                val response = dailyRecordService.updateSteps(request)
+                                val response2 =
+                                    dailyRecordService.updateBurnedKcalsFromSteps(request)
+                                println(response2)
+                                println(response)
+                                accumulatedSteps = 0
+                                isDone = true
+                            } catch (e: Exception) {
+                                println("Error en actualizar los pasos: ${e.message}")
+                            }
                         }
+                    } else{
+                        accumulatedSteps = 0
                     }
-
                 }
             }
         }

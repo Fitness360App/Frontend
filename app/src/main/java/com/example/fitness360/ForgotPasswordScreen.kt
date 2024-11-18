@@ -22,6 +22,7 @@ import com.example.fitness360.network.UserService
 import com.example.fitness360.utils.StepCounterViewModel
 import com.example.fitness360.utils.clearUserUid
 import com.example.fitness360.utils.getUserUid
+import com.example.fitness360.utils.saveUserUid
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,13 +62,13 @@ fun ForgotPasswordScreen(navController: NavController) {
         ){
             Column {
                 Text(
-                    text = "CONFIGURAR",
+                    text = "RECUPERAR",
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF333333)
                 )
                 Text(
-                    text = "CUENTA",
+                    text = "CONTRASEÑA",
                     fontSize = 22.sp,
                     color = Color(0xFF007ACC),
                     fontWeight = FontWeight.SemiBold
@@ -224,7 +225,8 @@ fun ForgotPasswordScreen(navController: NavController) {
                                                 showVerificationDialog = false
                                                 //Mostrar un mensaje de éxito
                                                 Toast.makeText(context, "Contraseña cambiada exitosamente", Toast.LENGTH_LONG).show()
-                                                navController.navigate("login")
+                                                saveUserUid(context, uid ?: "")
+                                                navController.navigate("home")
                                             }
                                         } else {
                                             errorMessage = "Error al cambiar la contraseña"

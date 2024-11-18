@@ -67,71 +67,25 @@ fun MainScreen() {
     lateinit var cameraExecutor: ExecutorService
     cameraExecutor = Executors.newSingleThreadExecutor()
 
-
-    val stepCounterViewModel: StepCounterViewModel? = uid?.let {
-        androidx.lifecycle.viewmodel.compose.viewModel(
-            factory = StepCounterViewModelFactory(
-                context.applicationContext as Application,
-                it
-            )
+    val stepCounterViewModel: StepCounterViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = StepCounterViewModelFactory(context.applicationContext as Application,
+            context
         )
-    }
+    )
 
     val startDestination = if (uid == null) "auth" else "home"
 
     NavHost(navController, startDestination = startDestination) {
         composable("auth") { AuthScreen(navController) }
-        composable("forgotPassword") { ForgotPasswordScreen(navController) }
         composable("login") { LoginScreen(navController) }
         composable("register") { RegisterScreen(navController) }
-        composable("home") {
-            if (stepCounterViewModel != null) {
-                HomeScreen(navController, viewModel = stepCounterViewModel)
-            } else {
-                // Manejar el caso sin ViewModel si es necesario
-                AuthScreen(navController)
-            }
-        }
-        composable("search") {
-            if (stepCounterViewModel != null) {
-                SearchFoodScreen(navController, viewModel = stepCounterViewModel, cameraExecutor)
-            } else {
-                // Manejar el caso sin ViewModel si es necesario
-                AuthScreen(navController)
-            }
-        }
-        composable("calculators") {
-            if (stepCounterViewModel != null) {
-                CalculatorsScreen(navController, viewModel = stepCounterViewModel)
-            } else {
-                // Manejar el caso sin ViewModel si es necesario
-                AuthScreen(navController)
-            }
-        }
-        composable("meal") {
-            if (stepCounterViewModel != null) {
-                MealScreen(navController, viewModel = stepCounterViewModel)
-            } else {
-                // Manejar el caso sin ViewModel si es necesario
-                AuthScreen(navController)
-            }
-        }
-        composable("settings") {
-            if (stepCounterViewModel != null) {
-                SettingsScreen(navController, viewModel = stepCounterViewModel)
-            } else {
-                // Manejar el caso sin ViewModel si es necesario
-                AuthScreen(navController)
-            }
-        }
-        composable("AccountSettingsScreen") {
-            if (stepCounterViewModel != null) {
-                AccountSettingsScreen(navController, viewModel = stepCounterViewModel)
-            } else {
-                // Manejar el caso sin ViewModel si es necesario
-                AuthScreen(navController)
-            }
-        }
+        composable("forgotPassword") { ForgotPasswordScreen(navController) }
+        composable("home") { HomeScreen(navController, viewModel = stepCounterViewModel) }
+        composable("search") { SearchFoodScreen(navController, viewModel = stepCounterViewModel, cameraExecutor) }
+        composable("calculators") { CalculatorsScreen(navController, viewModel = stepCounterViewModel) }
+        composable("meal") { MealScreen(navController, viewModel = stepCounterViewModel) }
+        composable("settings") { SettingsScreen(navController, viewModel = stepCounterViewModel) }
+        composable("AccountSettingsScreen") { AccountSettingsScreen(navController, viewModel = stepCounterViewModel) }
     }
 }
 

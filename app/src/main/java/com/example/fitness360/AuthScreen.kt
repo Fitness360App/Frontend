@@ -1,5 +1,6 @@
 package com.example.fitness360
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -62,8 +63,10 @@ fun AuthScreen(navController: NavController) {
             "¿Olvidaste tu contraseña?",
             modifier = Modifier
                 .padding(top = 16.dp)
-                .align(Alignment.CenterHorizontally),
-            style = MaterialTheme.typography.bodySmall,
+                .align(Alignment.CenterHorizontally)
+                .clickable { navController.navigate("forgotPassword") },
+            style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
+
         )
     }
 }

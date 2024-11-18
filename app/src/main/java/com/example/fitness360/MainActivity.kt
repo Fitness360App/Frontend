@@ -68,12 +68,9 @@ fun MainScreen() {
     cameraExecutor = Executors.newSingleThreadExecutor()
 
     val stepCounterViewModel: StepCounterViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-        factory = uid?.let {
-            StepCounterViewModelFactory(
-                context.applicationContext as Application,
-                it
-            )
-        }
+        factory = StepCounterViewModelFactory(context.applicationContext as Application,
+            context
+        )
     )
 
     val startDestination = if (uid == null) "auth" else "home"
@@ -82,6 +79,7 @@ fun MainScreen() {
         composable("auth") { AuthScreen(navController) }
         composable("login") { LoginScreen(navController) }
         composable("register") { RegisterScreen(navController) }
+        composable("forgotPassword") { ForgotPasswordScreen(navController) }
         composable("home") { HomeScreen(navController, viewModel = stepCounterViewModel) }
         composable("search") { SearchFoodScreen(navController, viewModel = stepCounterViewModel, cameraExecutor) }
         composable("calculators") { CalculatorsScreen(navController, viewModel = stepCounterViewModel) }

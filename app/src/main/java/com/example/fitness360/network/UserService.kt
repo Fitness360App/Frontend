@@ -63,6 +63,10 @@ data class UserGoalsForModification (
     val kcals: Int
 )
 
+data class UserIdAndValidationCode(
+    val uid: String,
+    val validationCode: String
+)
 
 interface UserService {
     @GET("api/users/getUserDataByID/{uid}")
@@ -86,5 +90,7 @@ interface UserService {
     @PUT("api/users/modifyUserGoals")
     suspend fun modifyUserGoals(@Body updatedGoals: UserGoalsForModification): Response<Void>
 
+    @GET("api/users/sendEmailConfirmationbyEmail/{email}")
+    suspend fun sendEmailConfirmationbyEmail(@Path("email") email: String): Response<UserIdAndValidationCode>
 
 }

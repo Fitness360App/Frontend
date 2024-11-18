@@ -109,7 +109,7 @@ fun LoginScreen(navController: NavController) {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Usuario") },
+                label = { Text("Correo") },
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(30.dp)
@@ -130,7 +130,7 @@ fun LoginScreen(navController: NavController) {
                 text = "¿Has olvidado la contraseña?",
                 modifier = Modifier
                     .padding(top = 16.dp)
-                    .clickable { /* Acción para recuperar contraseña */ },
+                    .clickable { navController.navigate("forgotPassword") },
                 style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
             )
 

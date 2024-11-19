@@ -10,7 +10,8 @@ data class Food(
     val name: String,             // Nombre del alimento
     val brand: String,            // Marca del alimento
     val servingSize: Double,      // Tamaño de la porción (en gramos o mililitros)
-    val nutrients: Nutrients      // Información nutricional
+    val nutrients: Nutrients,      // Información nutricional
+    val imagePath: String,
 )
 
 data class Nutrients(

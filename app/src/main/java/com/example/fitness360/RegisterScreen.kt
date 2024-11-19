@@ -146,7 +146,7 @@ fun RegisterScreen(navController: NavController) {
                                     // Llamada a la API para crear el DailyRecord
                                     CoroutineScope(Dispatchers.IO).launch {
                                         try {
-                                            val response = dailyRecordService.createDailyRecord(dailyRecordRequest)
+
                                             withContext(Dispatchers.Main) {
                                                 if (response.isSuccessful) {
                                                     // Navegar a Home solo si el registro y el DailyRecord fueron exitosos

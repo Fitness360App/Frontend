@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -27,8 +28,39 @@ import kotlinx.coroutines.launch
 import com.example.fitness360.network.ApiClient
 import com.example.fitness360.network.FoodService
 import com.example.fitness360.network.MealService
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
+
+@Composable
+fun FoodImage(foodImagePath: String) {
+    val context = LocalContext.current
+
+    // Obtén el recurso dinámicamente
+    val resourceId = context.resources.getIdentifier(
+        foodImagePath.removeSuffix(".jpg"), // Remover extensión si es necesario
+        "drawable",
+        context.packageName
+    )
+
+    // Asegúrate de manejar el caso cuando no exista la imagen
+    if (resourceId != 0) {
+        Image(
+            painter = painterResource(id = resourceId),
+            contentDescription = null,
+            modifier = Modifier
+        )
+    } /*else {
+        // Imagen de respaldo si no se encuentra el recurso
+        Image(
+            painter = painterResource(id = R.drawable.placeholder), // Usa una imagen genérica
+            contentDescription = "Imagen no disponible",
+            modifier = Modifier
+        )
+    }*/
+}
 
 @Composable
 fun ProductCard(food: Food, uid: String) {
@@ -38,6 +70,8 @@ fun ProductCard(food: Food, uid: String) {
     val formattedName = food.name.split(" ").joinToString(" ") { word ->
         word.lowercase().replaceFirstChar { it.uppercase() }
     }
+
+    println(food)
 
     Box(
         modifier = Modifier
@@ -61,8 +95,20 @@ fun ProductCard(food: Food, uid: String) {
                         .height(250.dp),
                     contentAlignment = Alignment.TopEnd
                 ) {
+
+
                     Image(
-                        painter = painterResource(id = R.drawable.product_image),
+                        painter = if (!food.imagePath.isNullOrEmpty()) {
+                            painterResource(
+                                id = LocalContext.current.resources.getIdentifier(
+                                    food.imagePath.removeSuffix(".jpg"), // Remueve la extensión si está presente
+                                    "drawable",
+                                    LocalContext.current.packageName
+                                )
+                            )
+                        } else {
+                            painterResource(id = R.drawable.product_image) // Imagen de respaldo si `imagePath` es nulo o vacío
+                        },
                         contentDescription = food.name,
                         contentScale = ContentScale.Fit,
                         modifier = Modifier
@@ -71,6 +117,7 @@ fun ProductCard(food: Food, uid: String) {
                             .background(Color.White, shape = RoundedCornerShape(10.dp))
                             .padding(8.dp)
                     )
+
 
                     // Botón de añadir
                     Box(
@@ -257,11 +304,15 @@ fun AddToMealDialog(
                                         // Realiza la solicitud en segundo plano
                                         val response = mealService.addFoodToMeal(request).execute()
 
+                                        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                        val currentDate = dateFormat.format(Date())
+
+
                                         withContext(Dispatchers.Main) {
                                             if (response.isSuccessful) {
                                                 // Llama a la función updateProcess tras una adición exitosa
                                                 withContext(Dispatchers.IO) {
-                                                    mealService.updateProcess(uid).execute()
+                                                    mealService.updateProcess(uid, currentDate).execute()
                                                 }
 
                                                 onConfirm(selectedMeal, quantity)

@@ -344,13 +344,13 @@ fun NutritionalInfo(label: String, value: String) {
         Text(
             text = label,
             color = Color.White,
-            fontSize = 14.sp,
+            fontSize = 13.sp,
             fontWeight = FontWeight.Bold
         )
         Text(
             text = value,
             color = Color.White.copy(alpha = 0.7f),
-            fontSize = 12.sp
+            fontSize = 10.sp
         )
     }
 }

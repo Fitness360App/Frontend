@@ -143,9 +143,11 @@ fun RegisterScreen(navController: NavController) {
                                     // Crear la solicitud para DailyRecord con el UID y la fecha actual
                                     val dailyRecordRequest = DailyRecordRequest(uid = registerResponse.uid, date = currentDate)
 
+                                    println(dailyRecordRequest)
                                     // Llamada a la API para crear el DailyRecord
                                     CoroutineScope(Dispatchers.IO).launch {
                                         try {
+                                            val response = dailyRecordService.createDailyRecord(dailyRecordRequest)
 
                                             withContext(Dispatchers.Main) {
                                                 if (response.isSuccessful) {

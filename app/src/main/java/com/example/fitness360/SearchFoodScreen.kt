@@ -78,6 +78,7 @@ fun SearchFoodScreen(
         coroutineScope.launch {
             try {
                 val response = foodService.getFeaturedFoods()
+                println(response.body())
                 if (response.isSuccessful) {
                     foodResults = response.body() ?: emptyList()
                 } else {

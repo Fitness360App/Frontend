@@ -27,6 +27,9 @@ import com.example.fitness360.utils.StepCounterViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 data class FoodItem(val name: String, var barcode: String, var quantity: Int, val calories: Float, val carbs: Float, val fats: Float, val proteins: Float)
 
@@ -302,8 +305,11 @@ fun EditFoodDialog(
                             println("Error al actualizar en el backend: ${response.errorBody()}")
                         } else {
 
+                            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            val currentDate = dateFormat.format(Date())
+
                             withContext(Dispatchers.IO) {
-                                val updateResponse = mealService.updateProcess(uid).execute()
+                                val updateResponse = mealService.updateProcess(uid, currentDate).execute()
                                 if (!updateResponse.isSuccessful) {
                                     println("Error al actualizar el proceso: ${updateResponse.errorBody()}")
                                 } else {
@@ -338,8 +344,11 @@ fun EditFoodDialog(
                         } else {
                             println("Eliminación exitosa en el backend")
 
+                            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            val currentDate = dateFormat.format(Date())
+
                             withContext(Dispatchers.IO) {
-                                val updateResponse = mealService.updateProcess(uid).execute()
+                                val updateResponse = mealService.updateProcess(uid, currentDate).execute()
                                 if (!updateResponse.isSuccessful) {
                                     println("Error al actualizar el proceso: ${updateResponse.errorBody()}")
                                 } else {

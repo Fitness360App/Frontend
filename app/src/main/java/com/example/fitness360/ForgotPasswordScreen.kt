@@ -1,5 +1,7 @@
 package com.example.fitness360
 
+import DailyRecordRequest
+import DailyRecordService
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +30,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.example.fitness360.utils.validatePassword
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun ForgotPasswordScreen(navController: NavController) {
@@ -145,9 +150,7 @@ fun ForgotPasswordScreen(navController: NavController) {
                             showVerificationDialog = true
                             CoroutineScope(Dispatchers.IO).launch {
                                 try {
-                                    println("Correo actual: $currentEmail")
                                     val response = userService.sendEmailConfirmationbyEmail(currentEmail)
-                                    println(response)
                                     if (response.isSuccessful) {
                                         val responseData = response.body()
                                         if (responseData != null) {
@@ -220,14 +223,53 @@ fun ForgotPasswordScreen(navController: NavController) {
                                         val response = userService.changeUserPassword(request)
                                         println(response);
                                         println("Contraseña cambiada")
+
                                         if (response.isSuccessful) {
-                                            withContext(Dispatchers.Main) {
-                                                showVerificationDialog = false
-                                                //Mostrar un mensaje de éxito
-                                                Toast.makeText(context, "Contraseña cambiada exitosamente", Toast.LENGTH_LONG).show()
-                                                saveUserUid(context, uid ?: "")
-                                                navController.navigate("home")
+
+                                            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                            val currentDate = dateFormat.format(Date())
+
+                                            // Instancia del servicio DailyRecordService
+                                            val dailyRecordService = ApiClient.retrofit.create(DailyRecordService::class.java)
+
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                // Comprobar si existe el dailyRecord
+                                                val checkResponse = uid?.let {
+                                                    dailyRecordService.getDailyRecord(
+                                                        it, currentDate)
+                                                }
+                                                if (checkResponse != null) {
+                                                    if (!checkResponse.isSuccessful) {
+                                                        // Si no existe, crearlo
+                                                        val dailyRecordRequest = uid?.let {
+                                                            DailyRecordRequest(
+                                                                uid = it,
+                                                                date = currentDate
+                                                            )
+                                                        }
+                                                        if (dailyRecordRequest != null) {
+                                                            dailyRecordService.createDailyRecord(dailyRecordRequest)
+                                                        }
+                                                    }
+                                                }
+
+                                                // Navegar a Home después de la verificación/creación del registro diario
+                                                withContext(Dispatchers.Main) {
+                                                    showVerificationDialog = false
+                                                    Toast.makeText(context, "Contraseña cambiada exitosamente", Toast.LENGTH_LONG).show()
+                                                    saveUserUid(context, uid ?: "")
+                                                    navController.navigate("home")
+                                                }
                                             }
+                                            /* withContext(Dispatchers.Main) {
+                                                 showVerificationDialog = false
+                                                 Mostrar un mensaje de éxito
+                                                 Toast.makeText(context, "Contraseña cambiada exitosamente", Toast.LENGTH_LONG).show()
+                                                 saveUserUid(context, uid ?: "")
+                                                 navController.navigate("home")
+                                             }*/
+
+
                                         } else {
                                             errorMessage = "Error al cambiar la contraseña"
                                         }

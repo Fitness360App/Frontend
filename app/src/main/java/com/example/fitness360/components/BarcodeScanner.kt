@@ -24,11 +24,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.example.fitness360.R
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 import java.util.concurrent.ExecutorService
@@ -38,6 +40,7 @@ import java.util.concurrent.Executors
 fun BarcodeScanner(cameraExecutor: ExecutorService, isCameraOpenSearch: Boolean, navController: NavController,onBarcodeScanned: (String) -> Unit) {
     var barcodeResult by remember { mutableStateOf("Código de barras: ") }
     var isCameraOpen by remember { mutableStateOf(isCameraOpenSearch) } // Controla si la cámara está abierta
+    val errorCameraPermission = stringResource(R.string.error_camera_permission)
 
     val context = LocalContext.current
 
@@ -48,7 +51,7 @@ fun BarcodeScanner(cameraExecutor: ExecutorService, isCameraOpenSearch: Boolean,
         if (isGranted) {
             isCameraOpen = true
         } else {
-            barcodeResult = "Permiso de cámara denegado"
+            barcodeResult = errorCameraPermission
         }
     }
 
@@ -77,7 +80,7 @@ fun BarcodeScanner(cameraExecutor: ExecutorService, isCameraOpenSearch: Boolean,
                 AndroidView({ previewView }, modifier = Modifier.fillMaxSize())  // Mostrar la vista previa de la cámara
 
                 Text(
-                    text = "¡Escanee el código de barras de su producto para buscarlo!",
+                    text = stringResource(R.string.scan_barcode_label),
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .padding(16.dp),
@@ -105,7 +108,7 @@ fun BarcodeScanner(cameraExecutor: ExecutorService, isCameraOpenSearch: Boolean,
                         .align(Alignment.BottomCenter)
                         .padding(16.dp)
                 ) {
-                    Text(text = "Cerrar Cámara")
+                    Text(text = stringResource(R.string.close_camera))
                 }
             }
         }

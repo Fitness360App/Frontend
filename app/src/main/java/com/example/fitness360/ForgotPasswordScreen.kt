@@ -13,17 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fitness360.network.ApiClient
 import com.example.fitness360.network.UserChangePasswordRequest
-import com.example.fitness360.network.UserSendEmailRequest
 import com.example.fitness360.network.UserService
-import com.example.fitness360.utils.StepCounterViewModel
-import com.example.fitness360.utils.clearUserUid
-import com.example.fitness360.utils.getUserUid
 import com.example.fitness360.utils.saveUserUid
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +45,22 @@ fun ForgotPasswordScreen(navController: NavController) {
     var context = LocalContext.current
     var receiveCode by remember { mutableStateOf("") }
     var uid by remember { mutableStateOf<String?>(null) }
+    val passwordDoNotMatchMessage = stringResource(R.string.password_mismatch)
+    val passwordEmptyMessage = stringResource(R.string.empty_fields)
+    val emailVerificationMessage = stringResource(R.string.verification_sent)
+    val emailVerificationFailedMessage = stringResource(R.string.verification_failed)
+    val passwordChangedSuccesfully = stringResource(R.string.password_changed_successfully)
+    val codeNotValid = stringResource(R.string.verification_code_error)
+    val codeEmpty = stringResource(R.string.empty_code_field)
+    val passwordChangeError = stringResource(R.string.password_change_error)
+    val emailSendingError = stringResource(R.string.error_sending_email)
+    val password_less_than_8 = stringResource(R.string.password_less_than_8)
+    val password_must_contain_uppercase = stringResource(R.string.password_must_contain_uppercase)
+    val password_must_contain_lowercase = stringResource(R.string.password_must_contain_lowercase)
+    val password_must_contain_number = stringResource(R.string.password_must_contain_number)
+    val password_must_contain_special = stringResource(R.string.password_must_contain_special)
+    val password_exceptions = listOf(password_less_than_8, password_must_contain_uppercase, password_must_contain_lowercase, password_must_contain_number, password_must_contain_special)
+
 
     Column(
         modifier = Modifier
@@ -67,13 +80,13 @@ fun ForgotPasswordScreen(navController: NavController) {
         ){
             Column {
                 Text(
-                    text = "RECUPERAR",
+                    text = stringResource(R.string.recover_password),
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF333333)
                 )
                 Text(
-                    text = "CONTRASEÑA",
+                    text = stringResource(R.string.password_uppercase),
                     fontSize = 22.sp,
                     color = Color(0xFF007ACC),
                     fontWeight = FontWeight.SemiBold
@@ -81,7 +94,7 @@ fun ForgotPasswordScreen(navController: NavController) {
             }
 
             Text(
-                text = "Volver",
+                text = stringResource(R.string.back),
                 fontSize = 18.sp,
                 color = Color(0xFF007ACC),
                 fontWeight = FontWeight.SemiBold,
@@ -102,7 +115,7 @@ fun ForgotPasswordScreen(navController: NavController) {
         OutlinedTextField(
             value = currentEmail,
             onValueChange = { currentEmail = it },
-            label = { Text("Email Actual") },
+            label = { Text(stringResource(R.string.current_email)) },
             modifier = Modifier.fillMaxWidth()
         )
         
@@ -110,7 +123,7 @@ fun ForgotPasswordScreen(navController: NavController) {
         OutlinedTextField(
             value = newPassword,
             onValueChange = { newPassword = it },
-            label = { Text("Nueva Contraseña") },
+            label = { Text(stringResource(R.string.new_password)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -118,7 +131,7 @@ fun ForgotPasswordScreen(navController: NavController) {
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Confirmar Nueva Contraseña") },
+            label = { Text(stringResource(R.string.confirm_new_password)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -132,18 +145,18 @@ fun ForgotPasswordScreen(navController: NavController) {
 
 
             Text (
-                text = "Cambiar Contraseña",
+                text = stringResource(R.string.change_password),
                 fontSize = 18.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .clickable {
                         if (newPassword != confirmPassword) {
-                            errorMessage = "Las contraseñas no coinciden"
+                            errorMessage = passwordDoNotMatchMessage
                         } else if (newPassword.isEmpty()) {
-                            errorMessage = "Todos los campos son obligatorios"
-                        } else if (validatePassword(newPassword) != null) {
-                            errorMessage = validatePassword(newPassword)
+                            errorMessage = passwordEmptyMessage
+                        } else if (validatePassword(newPassword, password_exceptions) != null) {
+                            errorMessage = validatePassword(newPassword, password_exceptions)
                         }
                         else {
                             errorMessage = null
@@ -159,13 +172,13 @@ fun ForgotPasswordScreen(navController: NavController) {
 
                                             println("UID: $uid, Código de validación: $receiveCode")
 
-                                            verificationMessage = "Se ha enviado un correo de verificación a su correo electrónico"
+                                            verificationMessage = emailVerificationMessage
                                         } else {
-                                            verificationMessage = "Respuesta vacía del servidor"
+                                            verificationMessage = emailVerificationFailedMessage
                                         }
                                     }
                                 } catch (e: Exception) {
-                                    verificationMessage = "Error al enviar el correo: ${e.message}"
+                                    verificationMessage = emailSendingError + e.message
                                 }
                             }
                         }
@@ -192,7 +205,7 @@ fun ForgotPasswordScreen(navController: NavController) {
     if (showVerificationDialog) {
         AlertDialog(
             onDismissRequest = { showVerificationDialog = false },
-            title = { Text("Verificación de Código") },
+            title = { Text(stringResource(R.string.verification_code_title)) },
             text = {
                 Column {
                     Text(verificationMessage)
@@ -200,7 +213,7 @@ fun ForgotPasswordScreen(navController: NavController) {
                     OutlinedTextField(
                         value = verificationCode,
                         onValueChange = { verificationCode = it },
-                        label = { Text("Ingrese el Código de Verificación") },
+                        label = { Text(stringResource(R.string.verification_code_message)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -256,44 +269,35 @@ fun ForgotPasswordScreen(navController: NavController) {
                                                 // Navegar a Home después de la verificación/creación del registro diario
                                                 withContext(Dispatchers.Main) {
                                                     showVerificationDialog = false
-                                                    Toast.makeText(context, "Contraseña cambiada exitosamente", Toast.LENGTH_LONG).show()
+                                                    Toast.makeText(context, passwordChangedSuccesfully, Toast.LENGTH_LONG).show()
                                                     saveUserUid(context, uid ?: "")
                                                     navController.navigate("home")
                                                 }
                                             }
-                                            /* withContext(Dispatchers.Main) {
-                                                 showVerificationDialog = false
-                                                 Mostrar un mensaje de éxito
-                                                 Toast.makeText(context, "Contraseña cambiada exitosamente", Toast.LENGTH_LONG).show()
-                                                 saveUserUid(context, uid ?: "")
-                                                 navController.navigate("home")
-                                             }*/
-
-
                                         } else {
-                                            errorMessage = "Error al cambiar la contraseña"
+                                            errorMessage = passwordChangeError
                                         }
                                     } catch (e: Exception) {
                                         withContext(Dispatchers.Main) {
                                             errorMessage =
-                                                "Error al cambiar la contraseña: ${e.message}"
+                                                passwordChangeError + e.message
                                         }
                                     }
                                 }
                             } else {
-                                errorMessage = "El código de verificación no es válido"
+                                errorMessage = codeNotValid
                             }
                         } else {
-                            errorMessage = "El campo de código no puede estar vacío"
+                            errorMessage = codeEmpty
                         }
                     }
                 ) {
-                    Text("Confirmar")
+                    Text(stringResource(R.string.confirm))
                 }
             },
             dismissButton = {
                 Button(onClick = { showVerificationDialog = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

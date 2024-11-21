@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
@@ -55,7 +56,7 @@ fun AuthScreen(navController: NavController) {
             ),
             shape = RoundedCornerShape(50)
         ) {
-            Text("Iniciar Sesión", color = Color(0xFF0066A1))
+            Text(stringResource(R.string.login), color = Color(0xFF0066A1))
         }
 
         // Botón 'Registrarse'
@@ -69,12 +70,12 @@ fun AuthScreen(navController: NavController) {
             ),
             shape = RoundedCornerShape(50)
         ) {
-            Text("Registrarse", color = Color.White)
+            Text(stringResource(R.string.signup), color = Color.White)
         }
 
         // Enlace '¿Olvidaste tu contraseña?'
         Text(
-            "¿Olvidaste tu contraseña?",
+            stringResource(R.string.forgot_password_question),
             modifier = Modifier
                 .padding(top = 16.dp)
                 .align(Alignment.CenterHorizontally)

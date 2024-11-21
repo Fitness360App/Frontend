@@ -43,6 +43,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 
 import com.example.fitness360.network.UserData
 
@@ -76,7 +77,13 @@ fun HomeScreen(navController: NavController, viewModel: StepCounterViewModel) {
 
     var userData by remember { mutableStateOf<UserData?>(null) }
     var dailyRecord by remember { mutableStateOf<DailyRecord?>(null) }
-    var loadStatus by remember { mutableStateOf("Cargando...") }
+    val loadingMessage =  stringResource(R.string.loading)
+    val loadedMessage =  stringResource(R.string.loaded_user_data)
+    val errorloadingMessage =  stringResource(R.string.error_user_data)
+    val loaded_daily_record =  stringResource(R.string.loaded_daily_record)
+    val error_daily_record =  stringResource(R.string.error_daily_record)
+    val error_network =  stringResource(R.string.error_network)
+    var loadStatus by remember { mutableStateOf(loadingMessage) }
     val userService = ApiClient.retrofit.create(UserService::class.java)
     val dailyRecordService = ApiClient.retrofit.create(DailyRecordService::class.java)
 
@@ -92,21 +99,21 @@ fun HomeScreen(navController: NavController, viewModel: StepCounterViewModel) {
                     if (userResponse.isSuccessful) {
                         userData = userResponse.body()
                         println(userData)
-                        loadStatus = "Datos del usuario cargados"
+                        loadStatus = loadedMessage
                     } else {
-                        loadStatus = "Error al cargar los datos del usuario."
+                        loadStatus = errorloadingMessage
                     }
 
                     val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
                     val recordResponse = dailyRecordService.getDailyRecord(uid, currentDate)
                     if (recordResponse.isSuccessful) {
                         dailyRecord = recordResponse.body()
-                        loadStatus = "Registro diario cargado"
+                        loadStatus = loaded_daily_record
                     } else {
-                        loadStatus = "Error al cargar el registro diario."
+                        loadStatus = error_daily_record
                     }
                 } catch (e: Exception) {
-                    loadStatus = "Error de red: ${e.message}"
+                    loadStatus = error_network + e.message
                 }
 
                 // Espera antes de la próxima actualización
@@ -130,13 +137,13 @@ fun HomeScreen(navController: NavController, viewModel: StepCounterViewModel) {
                 modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)
             ) {
                 Text(
-                    text = "HOLA",
+                    text = stringResource(R.string.hello),
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
                 Text(
-                    text = userData?.name?.lowercase()?.replaceFirstChar { it.uppercase() } ?: "Cargando...",
+                    text = userData?.name?.lowercase()?.replaceFirstChar { it.uppercase() } ?: loadingMessage,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF0066A1)
@@ -231,9 +238,9 @@ fun MultiLayerCircularIndicators(
         println(dailyRecord.nutrients)
         // Datos de nutrientes, usando los valores de dailyRecord
         val nutrients = listOf(
-            Triple("Carbohidratos", "${dailyRecord.nutrients.consumedCarbs.toInt()}/${userData.carbs}gr", Color(0xFF7FB2D0)),
-            Triple("Proteínas", "${dailyRecord.nutrients.consumedProteins.toInt()}/${userData.proteins}gr", Color(0xFF3385B4)),
-            Triple("Grasas", "${dailyRecord.nutrients.consumedFats.toInt()}/${userData.fats}gr", Color(0xFF05476D))
+            Triple(stringResource(R.string.carbs), "${dailyRecord.nutrients.consumedCarbs.toInt()}/${userData.carbs}gr", Color(0xFF7FB2D0)),
+            Triple(stringResource(R.string.proteins), "${dailyRecord.nutrients.consumedProteins.toInt()}/${userData.proteins}gr", Color(0xFF3385B4)),
+            Triple(stringResource(R.string.fats), "${dailyRecord.nutrients.consumedFats.toInt()}/${userData.fats}gr", Color(0xFF05476D))
         )
 
         Column(horizontalAlignment = Alignment.Start) {
@@ -375,11 +382,11 @@ fun ActivitySummary(steps: Int, burnedKcals: Int, consumedKcals: Int, totalKcals
                     verticalArrangement = Arrangement.Top
                 ) {
                     // Resumen de actividad
-                    ActivitySummaryItem(Icons.Default.DirectionsWalk, "$steps", "pasos")
+                    ActivitySummaryItem(Icons.Default.DirectionsWalk, "$steps", stringResource(R.string.steps_label))
                     Spacer(modifier = Modifier.height(16.dp))
-                    ActivitySummaryItem(Icons.Default.LocalFireDepartment, "$burnedKcals", "kcals")
+                    ActivitySummaryItem(Icons.Default.LocalFireDepartment, "$burnedKcals", stringResource(R.string.kcals_label))
                     Spacer(modifier = Modifier.height(16.dp))
-                    ActivitySummaryItem(Icons.Default.Fastfood, "$consumedKcals", "kcals")
+                    ActivitySummaryItem(Icons.Default.Fastfood, "$consumedKcals", stringResource(R.string.kcals_label))
                 }
 
                 Canvas(

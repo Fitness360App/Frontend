@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,7 +43,8 @@ fun SettingsScreen(navController: NavController, viewModel: StepCounterViewModel
     val context = LocalContext.current
     val uid = getUserUid(context)
     var userData by remember { mutableStateOf<UserData?>(null) }
-    var loadStatus by remember { mutableStateOf("Cargando...") }
+    val loadingText = stringResource(R.string.loading)
+    var loadStatus by remember { mutableStateOf(loadingText) }
     val userService = ApiClient.retrofit.create(UserService::class.java)
     val coroutineScope = rememberCoroutineScope()
 
@@ -127,7 +129,7 @@ fun SettingsScreen(navController: NavController, viewModel: StepCounterViewModel
 
                 // Botón de Editar
                 Text(
-                    text = "Editar",
+                    text = stringResource(R.string.edit),
                     fontSize = 18.sp,
                     color = Color(0xFF007ACC),
                     fontWeight = FontWeight.SemiBold,
@@ -138,12 +140,13 @@ fun SettingsScreen(navController: NavController, viewModel: StepCounterViewModel
             }
 
             // Opciones de configuración
-            SettingsOption("Correo electrónico", userEmail)
-            SettingsOption("Peso Actual", "$currentWeight kg")
-            SettingsOption("Objetivo de Peso", "$targetWeight kg")
-            SettingsOption("Altura", "$height cm")
-            SettingsOption("Edad", "$age años")
-            SettingsOption("Nivel de Actividad", activityLevel)
+            println(userEmail)
+            SettingsOption(stringResource(R.string.email_label), userEmail)
+            SettingsOption(stringResource(R.string.actual_weight), "$currentWeight kg")
+            SettingsOption(stringResource(R.string.step_weight_goals), "$targetWeight kg")
+            SettingsOption(stringResource(R.string.height), "$height cm")
+            SettingsOption(stringResource(R.string.age_label), "$age años")
+            SettingsOption(stringResource(R.string.activity_level_label), activityLevel)
             SettingsOption("Idioma", language)
 
             Spacer(modifier = Modifier.weight(1f)) // Espacio flexible para empujar los botones hacia abajo
@@ -157,7 +160,7 @@ fun SettingsScreen(navController: NavController, viewModel: StepCounterViewModel
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Configurar Cuenta",
+                    text = stringResource(R.string.settings_title),
                     fontSize = 18.sp,
                     color = Color(0xFF007ACC),
                     fontWeight = FontWeight.Bold,
@@ -169,7 +172,7 @@ fun SettingsScreen(navController: NavController, viewModel: StepCounterViewModel
 
 
                 Text(
-                    text = "Cerrar Sesión",
+                    text = stringResource(R.string.logout),
                     fontSize = 18.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
@@ -268,11 +271,6 @@ fun SettingsScreen(navController: NavController, viewModel: StepCounterViewModel
     }
 }
 
-
-
-
-
-
 @Composable
 fun SettingsOption(title: String, value: String) {
     Column(
@@ -317,12 +315,12 @@ fun EditProfileDialog(
     var userLanguage by remember { mutableStateOf(language) }
 
     // Opciones para el nivel de actividad y el idioma
-    val activityOptions = listOf("Sedentario", "Ligera", "Moderada", "Alta")
+    val activityOptions = listOf(stringResource(R.string.activity_level_sedentary), stringResource(R.string.activity_level_light), stringResource(R.string.activity_level_moderate), stringResource(R.string.activity_level_high))
     val languageOptions = listOf("Español (ES)", "Inglés (EN)")
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Editar Perfil", fontWeight = FontWeight.Bold, color = Color(0xFF007ACC)) },
+        title = { Text(text = stringResource(R.string.edit_profile), fontWeight = FontWeight.Bold, color = Color(0xFF007ACC)) },
         text = {
             Box(
                 modifier = Modifier
@@ -330,15 +328,15 @@ fun EditProfileDialog(
                     .padding(start = 16.dp, top = 16.dp, end = 16.dp) // Más padding en los laterales del diálogo
             ) {
                 LazyColumn {
-                    item { OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Nombre") }) }
-                    item { OutlinedTextField(value = lastName, onValueChange = { lastName = it }, label = { Text("Apellido") }) }
+                    item { OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text(stringResource(R.string.first_name_label)) }) }
+                    item { OutlinedTextField(value = lastName, onValueChange = { lastName = it }, label = { Text(stringResource(R.string.surname)) }) }
 
                     item {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             OutlinedTextField(
                                 value = weight,
                                 onValueChange = { weight = it.filter { char -> char.isDigit() } }, // Solo números
-                                label = { Text("Peso Actual") },
+                                label = { Text(stringResource(R.string.actual_weight)) },
                                 modifier = Modifier.weight(1f)
                             )
                             Text(" kg", fontSize = 16.sp, modifier = Modifier.padding(start = 8.dp))
@@ -350,7 +348,7 @@ fun EditProfileDialog(
                             OutlinedTextField(
                                 value = goalWeight,
                                 onValueChange = { goalWeight = it.filter { char -> char.isDigit() } }, // Solo números
-                                label = { Text("Objetivo de Peso") },
+                                label = { Text(stringResource(R.string.step_weight_goals)) },
                                 modifier = Modifier.weight(1f)
                             )
                             Text(" kg", fontSize = 16.sp, modifier = Modifier.padding(start = 8.dp))
@@ -362,7 +360,7 @@ fun EditProfileDialog(
                             OutlinedTextField(
                                 value = userHeight,
                                 onValueChange = { userHeight = it.filter { char -> char.isDigit() } }, // Solo números
-                                label = { Text("Altura") },
+                                label = { Text(stringResource(R.string.height)) },
                                 modifier = Modifier.weight(1f)
                             )
                             Text(" cm", fontSize = 16.sp, modifier = Modifier.padding(start = 8.dp))
@@ -374,16 +372,16 @@ fun EditProfileDialog(
                             OutlinedTextField(
                                 value = userAge,
                                 onValueChange = { userAge = it.filter { char -> char.isDigit() } }, // Solo números
-                                label = { Text("Edad") },
+                                label = { Text(stringResource(R.string.age_label)) },
                                 modifier = Modifier.weight(1f)
                             )
-                            Text(" años", fontSize = 16.sp, modifier = Modifier.padding(start = 8.dp))
+                            Text(stringResource(R.string.years_old), fontSize = 16.sp, modifier = Modifier.padding(start = 8.dp))
                         }
                     }
 
                     item {
                         DropdownSelector(
-                            label = "Nivel de Actividad",
+                            label = stringResource(R.string.activity_level_label),
                             options = activityOptions,
                             selectedOption = activity,
                             onOptionSelected = { activity = it }
@@ -405,12 +403,12 @@ fun EditProfileDialog(
             TextButton(onClick = {
 
                 onSave(name, lastName, weight, goalWeight, userHeight, userAge, activity) }) {
-                Text("Guardar")
+                Text(stringResource(R.string.save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

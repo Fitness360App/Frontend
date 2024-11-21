@@ -3,17 +3,17 @@ package com.example.fitness360.utils
 import com.example.fitness360.network.Macros
 
 fun calculateMacros(weight: Int, height: Int, age: Int, gender: String, activityLevel: String): Macros {
-    val bmr = if (gender == "Hombre") {
+    val bmr = if (gender == "Hombre" || gender == "Male") {
         10 * weight + 6.25 * height - 5 * age + 5
     } else {
         10 * weight + 6.25 * height - 5 * age - 161
     }
 
     val activityMultiplier = when (activityLevel) {
-        "Sedentario" -> 1.2
-        "Ligera" -> 1.375
-        "Moderada" -> 1.55
-        "Alta" -> 1.725
+        "Sedentario", "Sedentary" -> 1.2
+        "Ligera", "Light" -> 1.375
+        "Moderada", "Moderate" -> 1.55
+        "Alta", "High" -> 1.725
         else -> 1.2
     }
 

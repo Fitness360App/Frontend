@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -52,6 +53,10 @@ fun MealScreen(navController: NavController, viewModel: StepCounterViewModel) {
     val almuerzo = remember { mutableStateListOf<FoodItem>() }
     val merienda = remember { mutableStateListOf<FoodItem>() }
     val cena = remember { mutableStateListOf<FoodItem>() }
+    val desayunoLabel = stringResource(R.string.breakfast)
+    val almuerzoLabel = stringResource(R.string.lunch)
+    val meriendaLabel = stringResource(R.string.snack)
+    val cenaLabel = stringResource(R.string.dinner)
 
     var selectedFood by remember { mutableStateOf<FoodItem?>(null) }
 
@@ -59,10 +64,10 @@ fun MealScreen(navController: NavController, viewModel: StepCounterViewModel) {
         uid?.let { userId ->
             // Lista de pares de tipo de comida y su lista correspondiente
             val mealTypes = listOf(
-                "breakfast" to desayuno,
-                "lunch" to almuerzo,
-                "snack" to merienda,
-                "dinner" to cena
+                desayunoLabel to desayuno,
+                almuerzoLabel to almuerzo,
+                meriendaLabel to merienda,
+                cenaLabel to cena
             )
 
             // Iterar sobre cada par y cargar los alimentos
@@ -103,16 +108,16 @@ fun MealScreen(navController: NavController, viewModel: StepCounterViewModel) {
         ) {
             // Encabezado
             Column(modifier = Modifier.padding(bottom = 16.dp)) {
-                Text("COMIDAS", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Color(0xFF333333))
-                Text("DIARIAS", fontSize = 22.sp, color = Color(0xFF007ACC), fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.meal_title), fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Color(0xFF333333))
+                Text(stringResource(R.string.daily_title), fontSize = 22.sp, color = Color(0xFF007ACC), fontWeight = FontWeight.SemiBold)
             }
 
             // Mostrar cada tipo de comida con sus alimentos
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                item { MealList("Desayuno", desayuno) { selectedFood = it } }
-                item { MealList("Almuerzo", almuerzo) { selectedFood = it } }
-                item { MealList("Merienda", merienda) { selectedFood = it } }
-                item { MealList("Cena", cena) { selectedFood = it } }
+                item { MealList(stringResource(R.string.breakfast), desayuno) { selectedFood = it } }
+                item { MealList(stringResource(R.string.lunch), almuerzo) { selectedFood = it } }
+                item { MealList(stringResource(R.string.snack), merienda) { selectedFood = it } }
+                item { MealList(stringResource(R.string.dinner), cena) { selectedFood = it } }
                 item { Spacer(modifier = Modifier.height(56.dp)) }
             }
         }
@@ -122,10 +127,10 @@ fun MealScreen(navController: NavController, viewModel: StepCounterViewModel) {
         selectedFood?.let { food ->
             if (uid != null) {
                 val mealType = when {
-                    desayuno.contains(food) -> "breakfast"
-                    almuerzo.contains(food) -> "lunch"
-                    merienda.contains(food) -> "snack"
-                    cena.contains(food) -> "dinner"
+                    desayuno.contains(food) -> stringResource(R.string.breakfast)
+                    almuerzo.contains(food) -> stringResource(R.string.lunch)
+                    merienda.contains(food) -> stringResource(R.string.snack)
+                    cena.contains(food) -> stringResource(R.string.dinner)
                     else -> ""
                 }
 
@@ -241,12 +246,18 @@ fun FoodItemRow(food: FoodItem, onClick: () -> Unit) {
                     color = Color.Black
                 )
                 Text(
-                    text = "Cantidad: ${food.quantity}g",
+                    text = stringResource(R.string.quantity_dot, food.quantity),
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
                 Text(
-                    text = "Calorías: ${food.calories*(food.quantity/100f)} kcal | Carbs: ${food.carbs*(food.quantity/100f)}g | Grasas: ${food.fats*(food.quantity/100f)}g | Prot: ${food.proteins*(food.quantity/100f)}g",
+                    text = stringResource(
+                        id = R.string.food_info,
+                        (food.calories * (food.quantity / 100f)).toString(),
+                        (food.carbs * (food.quantity / 100f)).toString(),
+                        (food.fats * (food.quantity / 100f)).toString(),
+                        (food.proteins * (food.quantity / 100f)).toString()
+                    ),
                     fontSize = 12.sp,
                     color = Color.Gray
                 )
@@ -319,7 +330,7 @@ fun EditFoodDialog(
                     }
                 }
             }) {
-                Text("Guardar")
+                Text(stringResource(R.string.save))
             }
         },
         dismissButton = {
@@ -355,17 +366,17 @@ fun EditFoodDialog(
                     }
                 }
             }) {
-                Text("Eliminar")
+                Text(stringResource(R.string.delete))
             }
         },
-        title = { Text("Editar Alimento", color = Color(0xFF007ACC)) },
+        title = { Text(stringResource(R.string.edit_food), color = Color(0xFF007ACC)) },
         text = {
             Column {
-                Text(text = "Cantidad (en gramos):")
+                Text(text = stringResource(R.string.quantity_in_grams))
                 OutlinedTextField(
                     value = quantity,
                     onValueChange = { quantity = it },
-                    label = { Text("Cantidad") },
+                    label = { Text(stringResource(R.string.quantity) + ":") },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

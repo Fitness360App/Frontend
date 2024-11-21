@@ -62,6 +62,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import DailyRecordRequest
 import DailyRecordService
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -77,6 +78,7 @@ fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var loginStatus by remember { mutableStateOf("") }
+    val loginFailedMessage = stringResource(R.string.login_failed)
 
     // Crear instancia de AuthService usando Retrofit
     val authService = ApiClient.retrofit.create(AuthService::class.java)
@@ -99,7 +101,7 @@ fun LoginScreen(navController: NavController) {
         ) {
 
             Text(
-                text = "¡ Bienvenido/a !",
+                text = stringResource(R.string.welcome_message),
                 fontWeight = FontWeight.Bold,
                 fontSize = 40.sp,
                 modifier = Modifier
@@ -109,7 +111,7 @@ fun LoginScreen(navController: NavController) {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Correo") },
+                label = { Text(stringResource(R.string.email)) },
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(30.dp)
@@ -118,7 +120,7 @@ fun LoginScreen(navController: NavController) {
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Contraseña") },
+                label = { Text(stringResource(R.string.password)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp),
@@ -127,7 +129,7 @@ fun LoginScreen(navController: NavController) {
             )
 
             Text(
-                text = "¿Has olvidado la contraseña?",
+                text = stringResource(R.string.forgot_password),
                 modifier = Modifier
                     .padding(top = 16.dp)
                     .clickable { navController.navigate("forgotPassword") },
@@ -136,7 +138,7 @@ fun LoginScreen(navController: NavController) {
 
             // Uso del botón personalizado
             CustomButton(
-                text = "Iniciar Sesión",
+                text = stringResource(R.string.login),
                 onClick = {
                     val loginRequest = LoginRequest(email, password)
                     val call = authService.login(loginRequest)
@@ -180,7 +182,7 @@ fun LoginScreen(navController: NavController) {
                                     }
                                 }
                             } else {
-                                loginStatus = "Login fallido. Verifica tus credenciales."
+                                loginStatus = loginFailedMessage
                             }
                         }
 
@@ -196,11 +198,11 @@ fun LoginScreen(navController: NavController) {
                     .padding(top = 16.dp)
             ) {
                 Text(
-                    text = "¿Eres nuevo? ",
+                    text = stringResource(R.string.new_user),
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
                 Text(
-                    text = "Regístrate",
+                    text = stringResource(R.string.register),
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .clickable { navController.navigate("register") },

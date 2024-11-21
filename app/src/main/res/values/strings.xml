@@ -1,3 +1,184 @@
 <resources>
+    <!-- LoginScreen Strings -->
     <string name="app_name">Fitness360</string>
+    <string name="welcome_message">¡Bienvenido/a!</string>
+    <string name="email">Correo</string>
+    <string name="password">Contraseña</string>
+    <string name="forgot_password">¿Has olvidado la contraseña?</string>
+    <string name="login_button">Iniciar Sesión</string>
+    <string name="login_failed">Inicio de sesión fallido. Verifica tus credenciales.</string>
+    <string name="network_error">Error de red: </string>
+    <string name="new_user">¿Eres nuevo? </string>
+    <string name="register">Regístrate</string>
+
+    <!-- AuthScreen Strings -->
+    <string name="login">Iniciar Sesión</string>
+    <string name="signup">Registrarse</string>
+    <string name="forgot_password_question">¿Olvidaste tu contraseña?</string>
+
+    <!-- RegisterScreen Strings -->
+    <string name="email_label">Correo Electrónico</string>
+    <string name="error_empty">Este campo no puede estar vacío</string>
+    <string name="email_error_taken">El correo ya está registrado</string>
+    <string name="password_error_empty">Este campo no puede estar vacío</string>
+    <string name="confirm_password_label">Confirmar Contraseña</string>
+    <string name="confirm_password_error_mismatch">Las contraseñas no coinciden</string>
+    <string name="register_button_text">Iniciar Registro</string>
+    <string name="already_have_account">¿Ya tienes cuenta? </string>
+    <string name="login_button_text">Inicia Sesión</string>
+    <string name="step_personal_info">Información Personal</string>
+    <string name="first_name_label">Nombre</string>
+    <string name="last_name_label">Primer Apellido</string>
+    <string name="second_last_name_label">Segundo Apellido</string>
+    <string name="step_weight_goals">Objetivo de Peso</string>
+    <string name="current_weight_label">Peso Actual (kg)</string>
+    <string name="target_weight_label">Objetivo de Peso (kg)</string>
+    <string name="height_label">Altura (cm)</string>
+    <string name="age_label">Edad</string>
+    <string name="step_activity_info">Información de Actividad</string>
+    <string name="gender_label">Género</string>
+    <string name="gender_select">Seleccione género</string>
+    <string name="gender_options_male">Hombre</string>
+    <string name="gender_options_female">Mujer</string>
+    <string name="gender_options_other">Otro</string>
+    <string name="activity_level_label">Seleccione Nivel de Actividad</string>
+    <string name="activity_level_sedentary">Sedentario</string>
+    <string name="activity_level_light">Ligera</string>
+    <string name="activity_level_moderate">Moderada</string>
+    <string name="activity_level_high">Alta</string>
+    <string name="step_confirmation">¡Registro completo!</string>
+    <string name="previous_button_text">Anterior</string>
+    <string name="next_button_text">Siguiente</string>
+    <string name="finish_button_text">Finalizar</string>
+    <string name="registration_error">Registro fallido. Verifica tus datos.</string>
+    <string name="daily_record_error">Error al crear el registro diario: </string>
+    <string name="daily_record_network_error">Error de red al crear el registro diario: </string>
+    <string name="email_verification_error">Error al verificar el correo. Inténtalo nuevamente.</string>
+    <string name="email_verification_network_error">Error de red al verificar el correo: </string>
+    <string name="email_not_valid">El correo no es válido</string>
+    <string name="password_less_than_8">La contraseña debe tener al menos 8 caracteres.</string>
+    <string name="password_must_contain_uppercase">Debe contener al menos una letra minúscula.</string>
+    <string name="password_must_contain_lowercase">Debe contener al menos una letra mayúscula.</string>
+    <string name="password_must_contain_number">Debe contener al menos un número.</string>
+    <string name="password_must_contain_special">Debe contener al menos un carácter especial.</string>
+    <string name="invalid_weight">Peso inválido (30–300 kg)</string>
+    <string name="invalid_height">Altura inválida (50–250 cm)</string>
+    <string name="invalid_age">Edad inválida (10–120 años)</string>
+
+    <!-- ForgotPassword Strings -->
+    <string name="recover_password">RECUPERAR</string>
+    <string name="password_uppercase">CONTRASEÑA</string>
+    <string name="back">Volver</string>
+    <string name="current_email">Email Actual</string>
+    <string name="new_password">Nueva Contraseña</string>
+    <string name="confirm_new_password">Confirmar Nueva Contraseña</string>
+    <string name="change_password">Cambiar Contraseña</string>
+    <string name="error_passwords_do_not_match">Las contraseñas no coinciden</string>
+    <string name="error_fields_required">Todos los campos son obligatorios</string>
+    <string name="error_invalid_password">La contraseña no es válida</string>
+    <string name="email_sent_message">Se ha enviado un correo de verificación a su correo electrónico</string>
+    <string name="server_empty_response">Respuesta vacía del servidor</string>
+    <string name="email_send_error">Error al enviar el correo: %1$s</string>
+    <string name="code_verification_title">Verificación de Código</string>
+    <string name="enter_verification_code">Ingrese el Código de Verificación</string>
+    <string name="confirm">Confirmar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="password_change_success">Contraseña cambiada exitosamente</string>
+    <string name="error_password_change">Error al cambiar la contraseña</string>
+    <string name="error_code_invalid">El código de verificación no es válido</string>
+    <string name="error_code_empty">El campo de código no puede estar vacío</string>
+
+    <!-- HomeScreen Strings -->
+    <string name="loading">Cargando...</string>
+    <string name="error_user_data">Error al cargar los datos del usuario.</string>
+    <string name="error_daily_record">Error al cargar el registro diario.</string>
+    <string name="error_network">Error de red:</string>
+    <string name="loaded_user_data">Datos del usuario cargados</string>
+    <string name="loaded_daily_record">Registro diario cargado</string>
+    <string name="hello">HOLA</string>
+    <string name="steps_label">Pasos</string>
+    <string name="kcals_label">Kcals</string>
+    <string name="steps">pasos</string>
+    <string name="carbs">Carbohidratos</string>
+    <string name="proteins">Proteínas</string>
+    <string name="fats">Grasas</string>
+
+    <!-- SearchFood y camara Strings -->
+    <string name="search_product">Buscar Producto</string>
+    <string name="no_results">No se encontraron resultados</string>
+    <string name="close_camera">Cerrar Cámara</string>
+    <string name="error_camera">Error al abrir la cámara</string>
+    <string name="error_camera_permission">Permiso de cámara denegado</string>
+    <string name="scan_barcode_label">¡Escanee el código de barras de su producto para buscarlo!</string>
+    <string name="error_barcode">Error al escanear el código de barras</string>
+
+    <!-- FoodDetail Strings -->
+    <string name="kilocalories_label">Kilocalorías</string>
+    <string name="quantity">Cantidad</string>
+    <string name="write_quantity">Escribe la cantidad a añadir</string>
+    <string name="add">Añadir a la comida</string>
+    <string name="breakfast">Desayuno</string>
+    <string name="lunch">Almuerzo</string>
+    <string name="snack">Merienda</string>
+    <string name="dinner">Cena</string>
+
+    <!-- CalculatorsScreen Strings -->
+    <string name="calculator_title">CALCULADORA</string>
+    <string name="macronutrients_subtitle">MACRONUTRIENTES</string>
+    <string name="weight_label">Peso</string>
+    <string name="goal_label">Objetivo</string>
+    <string name="gain_weight">Ganar Peso</string>
+    <string name="lose_weight">Perder Peso</string>
+    <string name="user_data_title">Sus datos introducidos son</string>
+    <string name="macros_title">Sus macros son:</string>
+    <string name="calories_label">Kilocalorías</string>
+    <string name="proteins_label">Proteínas</string>
+    <string name="fats_label">Grasas</string>
+    <string name="carbs_label">Carbohidratos</string>
+    <string name="bmi_label">IMC</string>
+
+    <!-- MealScreen Strings -->
+    <string name="meal_title">COMIDAS</string>
+    <string name="daily_title">DIARIAS</string>
+    <string name="no_meals_added">(No se ha consumido ningún alimento)</string>
+    <string name="quantity_dot">Cantidad: %1$dg</string>
+    <string name="total_kcals">Calorías: %1$g</string>
+    <string name="food_info">
+        Calorías: %1$s kcal | Carbs: %2$s g | Grasas: %3$s g | Prot: %4$s g
+    </string>
+    <string name="save">Guardar</string>
+    <string name="delete">Eliminar</string>
+    <string name="edit_food">Editar Alimento</string>
+    <string name="quantity_in_grams">Cantidad (en gramos):</string>
+
+    <!-- SettingsScreen Strings -->
+    <string name="settings_title">Configurar Cuenta</string>
+    <string name="logout">Cerrar Sesión</string>
+    <string name="edit">Editar</string>
+    <string name="edit_profile">Editar Perfil</string>
+    <string name="surname">Apellido</string>
+    <string name="actual_weight">Peso Actual</string>
+    <string name="height">Altura</string>
+    <string name="years_old">años</string>
+
+
+    <!-- AccountSettings Strings -->
+    <string name="account_settings_title">CONFIGURAR</string>
+    <string name="account_settings_subtitle">CUENTA</string>
+    <string name="delete_account">Eliminar Cuenta</string>
+    <string name="confirm_delete">Confirmar Eliminación</string>
+    <string name="save_changes">Guardar Cambios</string>
+    <string name="password_mismatch">Las contraseñas no coinciden</string>
+    <string name="empty_fields">Todos los campos son obligatorios</string>
+    <string name="password_validation_error">La contraseña no cumple con los requisitos</string>
+    <string name="verification_code_title">Verificación de Código:</string>
+    <string name="verification_code_message">Ingrese el código de verificación</string>
+    <string name="verification_sent">Se ha enviado un correo de verificación a su correo electrónico</string>
+    <string name="verification_failed">No se pudo enviar el correo de verificación</string>
+    <string name="verification_code_error">El código de verificación no es válido</string>
+    <string name="empty_code_field">El campo de código no puede estar vacío</string>
+    <string name="password_changed_successfully">Contraseña cambiada exitosamente</string>
+    <string name="password_change_error">Error al cambiar la contraseña</string>
+    <string name="error_sending_email">Error al enviar el correo: </string>
+    <string name="confirm_delete_account">¿Está seguro de que desea eliminar su cuenta? Esta acción no se puede deshacer.</string>
 </resources>

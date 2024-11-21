@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -117,9 +118,9 @@ fun ProductCard(food: Food, uid: String) {
                             horizontalAlignment = Alignment.Start,
                             modifier = Modifier.weight(1f)
                         ) {
-                            NutritionalInfo(label = "Carbohidratos", value = "${food.nutrients.carbs.toInt()}gr/100gr")
+                            NutritionalInfo(label = stringResource(R.string.carbs_label), value = "${food.nutrients.carbs.toInt()}gr/100gr")
                             Spacer(modifier = Modifier.height(8.dp))
-                            NutritionalInfo(label = "Kilocalorías", value = "${food.nutrients.kcals.toInt()} kcals/100gr")
+                            NutritionalInfo(label = stringResource(R.string.calories_label), value = "${food.nutrients.kcals.toInt()} kcals/100gr")
                         }
 
                         Spacer(modifier = Modifier.width(32.dp))
@@ -128,9 +129,9 @@ fun ProductCard(food: Food, uid: String) {
                             horizontalAlignment = Alignment.Start,
                             modifier = Modifier.weight(1f)
                         ) {
-                            NutritionalInfo(label = "Grasas", value = "${food.nutrients.fats.toInt()}gr/100gr")
+                            NutritionalInfo(label = stringResource(R.string.fats_label), value = "${food.nutrients.fats.toInt()}gr/100gr")
                             Spacer(modifier = Modifier.height(8.dp))
-                            NutritionalInfo(label = "Proteínas", value = "${food.nutrients.proteins.toInt()}gr/100gr")
+                            NutritionalInfo(label = stringResource(R.string.carbs_label), value = "${food.nutrients.proteins.toInt()}gr/100gr")
                         }
                     }
                 }
@@ -163,9 +164,13 @@ fun AddToMealDialog(
     onDismiss: () -> Unit,
     onConfirm: (String, String) -> Unit
 ) {
-    var selectedMeal by remember { mutableStateOf("breakfast") }
+    val desayunoMessage = stringResource(R.string.breakfast)
+    val almuerzoMessage = stringResource(R.string.lunch)
+    val snackMessage = stringResource(R.string.snack)
+    val cenaMessage = stringResource(R.string.dinner)
+    var selectedMeal by remember { mutableStateOf(desayunoMessage) }
     var quantity by remember { mutableStateOf("") }
-    val mealOptions = listOf("breakfast", "lunch", "snack", "dinner")
+    val mealOptions = listOf(desayunoMessage, almuerzoMessage, snackMessage, cenaMessage)
     var expanded by remember { mutableStateOf(false) }
     val mealService = ApiClient.retrofit.create(MealService::class.java)
 
@@ -186,7 +191,7 @@ fun AddToMealDialog(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "Añadir a la comida",
+                    text = stringResource(R.string.add),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF005A9E)
@@ -223,8 +228,8 @@ fun AddToMealDialog(
                 OutlinedTextField(
                     value = quantity,
                     onValueChange = { quantity = it },
-                    label = { Text("Cantidad") },
-                    placeholder = { Text("Escribe la cantidad a añadir") },
+                    label = { Text(stringResource(R.string.quantity)) },
+                    placeholder = { Text(stringResource(R.string.write_quantity)) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF005A9E),
@@ -239,7 +244,7 @@ fun AddToMealDialog(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancelar", color = Color.Gray)
+                        Text(stringResource(R.string.cancel), color = Color.Gray)
                     }
                     Button(
                         onClick = {
@@ -278,7 +283,7 @@ fun AddToMealDialog(
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF005A9E))
                     ) {
-                        Text("Añadir", color = Color.White)
+                        Text(stringResource(R.string.add), color = Color.White)
                     }
                 }
             }

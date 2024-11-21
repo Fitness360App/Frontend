@@ -39,6 +39,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.example.fitness360.network.ApiClient
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.example.fitness360.components.BarcodeScanner
 
 
@@ -113,7 +114,7 @@ fun SearchFoodScreen(
                     onValueChange = { searchQuery = it },
                     placeholder = {
                         Text(
-                            text = "Buscar Producto",
+                            text = stringResource(R.string.search_product),
                             color = Color.Gray,
                             fontSize = 13.sp
                         )
@@ -217,7 +218,7 @@ fun SearchFoodScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "No se han encontrado resultados",
+                        text = stringResource(R.string.no_results),
                         color = Color.Gray,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium

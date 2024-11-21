@@ -2,7 +2,6 @@ package com.example.fitness360
 
 import DailyRecordRequest
 import DailyRecordService
-import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,12 +30,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.example.fitness360.network.ApiClient
 import com.example.fitness360.network.AuthService
-import com.example.fitness360.network.LoginResponse
-import com.example.fitness360.network.Macros
 import com.example.fitness360.network.RegisterRequest
 import com.example.fitness360.network.RegisterResponse
 import com.example.fitness360.network.UserService
@@ -46,7 +44,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.roundToInt
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -74,6 +71,10 @@ fun RegisterScreen(navController: NavController) {
     val totalSteps = 4
     val animatedProgress by animateFloatAsState(targetValue = step.toFloat() / (totalSteps - 1))
     val context = LocalContext.current
+    val daily_record_error = stringResource(R.string.daily_record_error)
+    val registration_error = stringResource(R.string.registration_error)
+    val daily_record_network_error = stringResource(R.string.daily_record_network_error)
+    val network_error = stringResource(R.string.network_error)
 
     // Variables para almacenar la información de registro
 
@@ -155,24 +156,24 @@ fun RegisterScreen(navController: NavController) {
                                                     }
                                                 } else {
                                                     // Manejo de error al crear el DailyRecord
-                                                    registerStatus = "Error al crear el registro diario: ${response.message()}"
+                                                    registerStatus = daily_record_error + response.message()
                                                 }
                                             }
                                         } catch (e: Exception) {
                                             withContext(Dispatchers.Main) {
-                                                registerStatus = "Error de red al crear el registro diario: ${e.message}"
+                                                registerStatus = daily_record_network_error + e.message
                                             }
                                         }
                                     }
                                 }
                             } else {
                                 // Manejo de errores
-                                registerStatus = "Registro fallido. Verifica tus datos."
+                                registerStatus = registration_error
                             }
                         }
 
                         override fun onFailure(call: Call<RegisterResponse>, t: Throwable) {
-                            registerStatus = "Error de red: ${t.message}"
+                            registerStatus = network_error + t.message
                         }
                     })
                 }
@@ -230,14 +231,27 @@ fun RegistrationForm(navController: NavController, onRegistrationStart: () -> Un
     var generalError by remember { mutableStateOf<String?>(null) }
     val userService = ApiClient.retrofit.create(UserService::class.java)
 
+    val password_error_empty = stringResource(R.string.password_error_empty)
+    val error_empty = stringResource(R.string.error_empty)
+    val confirm_password_error_mismatch = stringResource(R.string.confirm_password_error_mismatch)
+    val email_error_taken = stringResource(R.string.email_error_taken)
+    val email_verification_error = stringResource(R.string.email_verification_error)
+    val email_verification_network_error = stringResource(R.string.email_verification_network_error)
+    val email_not_valid = stringResource(R.string.email_not_valid)
+    val password_less_than_8 = stringResource(R.string.password_less_than_8)
+    val password_must_contain_uppercase = stringResource(R.string.password_must_contain_uppercase)
+    val password_must_contain_lowercase = stringResource(R.string.password_must_contain_lowercase)
+    val password_must_contain_number = stringResource(R.string.password_must_contain_number)
+    val password_must_contain_special = stringResource(R.string.password_must_contain_special)
+    val password_exceptions = listOf(password_less_than_8, password_must_contain_uppercase, password_must_contain_lowercase, password_must_contain_number, password_must_contain_special)
 
     val validateForm = {
-        emailError = validateMail(emailField) ?: if (emailField.isBlank()) "Este campo no puede estar vacío" else null
-        passwordError = validatePassword(passwordField) ?: if (passwordField.isBlank()) "Este campo no puede estar vacío" else null
-        confirmPasswordError = if (confirmPassword.isBlank()) "Este campo no puede estar vacío" else null
+        emailError = validateMail(emailField, email_not_valid) ?: if (emailField.isBlank()) error_empty else null
+        passwordError = validatePassword(passwordField, password_exceptions) ?: if (passwordField.isBlank()) password_error_empty else null
+        confirmPasswordError = if (confirmPassword.isBlank()) password_error_empty else null
 
         if (passwordField != confirmPassword) {
-            confirmPasswordError = "Las contraseñas no coinciden"
+            confirmPasswordError = confirm_password_error_mismatch
         }
 
         if (emailError == null && passwordError == null && confirmPasswordError == null) {
@@ -248,7 +262,7 @@ fun RegistrationForm(navController: NavController, onRegistrationStart: () -> Un
                     if (response.isSuccessful) {
                         val isEmailTaken = response.body() ?: false
                         if (isEmailTaken) {
-                            emailError = "El correo ya está registrado"
+                            emailError = email_error_taken
                         } else {
                             generalError = null
                             email = emailField
@@ -256,10 +270,10 @@ fun RegistrationForm(navController: NavController, onRegistrationStart: () -> Un
                             onRegistrationStart()
                         }
                     } else {
-                        generalError = "Error al verificar el correo. Inténtalo nuevamente."
+                        generalError = email_verification_error
                     }
                 } catch (e: Exception) {
-                    generalError = "Error al verificar el correo: ${e.message}"
+                    generalError = email_verification_network_error + e.message
                 }
             }
 
@@ -273,7 +287,7 @@ fun RegistrationForm(navController: NavController, onRegistrationStart: () -> Un
             .padding(top = 250.dp, start = 24.dp, end = 24.dp)
     ) {
         Text(
-            text = "¡ Bienvenido/a !",
+            text = stringResource(R.string.welcome_message),
             fontWeight = FontWeight.Bold,
             fontSize = 40.sp,
             modifier = Modifier
@@ -281,10 +295,10 @@ fun RegistrationForm(navController: NavController, onRegistrationStart: () -> Un
         )
 
         CustomOutlinedTextFieldWithValidation(
-            label = "Correo Electrónico",
+            label = stringResource(R.string.email_label),
             value = emailField,
             onValueChange = { emailField = it },
-            validation = { if (it.isBlank()) "Este campo no puede estar vacío" else null },
+            validation = { if (it.isBlank()) error_empty else null },
             shape = RoundedCornerShape(30.dp)
         )
         if (emailError != null) {
@@ -292,10 +306,10 @@ fun RegistrationForm(navController: NavController, onRegistrationStart: () -> Un
         }
 
         CustomOutlinedTextFieldWithValidation(
-            label = "Contraseña",
+            label = stringResource(R.string.password),
             value = passwordField,
             onValueChange = { passwordField = it },
-            validation = { if (it.isBlank()) "Este campo no puede estar vacío" else null },
+            validation = { if (it.isBlank()) error_empty else null },
             shape = RoundedCornerShape(30.dp),
             keyboardType = KeyboardType.Password
         )
@@ -304,10 +318,10 @@ fun RegistrationForm(navController: NavController, onRegistrationStart: () -> Un
         }
 
         CustomOutlinedTextFieldWithValidation(
-            label = "Confirmar Contraseña",
+            label = stringResource(R.string.confirm_password_label),
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            validation = { if (it.isBlank()) "Este campo no puede estar vacío" else null },
+            validation = { if (it.isBlank()) error_empty else null },
             shape = RoundedCornerShape(30.dp),
             keyboardType = KeyboardType.Password
         )
@@ -316,7 +330,7 @@ fun RegistrationForm(navController: NavController, onRegistrationStart: () -> Un
         }
 
         CustomButton(
-            text = "Iniciar Registro",
+            text = stringResource(R.string.register_button_text),
             onClick = validateForm
         )
 
@@ -325,9 +339,9 @@ fun RegistrationForm(navController: NavController, onRegistrationStart: () -> Un
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 16.dp)
         ) {
-            Text("¿Ya tienes cuenta? ")
+            Text(stringResource(R.string.already_have_account))
             Text(
-                text = "Inicia Sesión",
+                text = stringResource(R.string.login_button_text),
                 modifier = Modifier.clickable { navController.navigate("login") },
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
             )
@@ -348,10 +362,12 @@ fun StepPersonalInfo(onNext: () -> Unit, onPrevious: () -> Unit) {
     var lastNameError by remember { mutableStateOf<String?>(null) }
     var secondLastNameError by remember { mutableStateOf<String?>(null) }
 
+    val error_empty = stringResource(R.string.error_empty)
+
     val validateForm = {
-        firstNameError = if (firstNamefield.isBlank()) "Este campo no puede estar vacío" else null
-        lastNameError = if (lastNamefield.isBlank()) "Este campo no puede estar vacío" else null
-        secondLastNameError = if (secondLastNameField.isBlank()) "Este campo no puede estar vacío" else null
+        firstNameError = if (firstNamefield.isBlank()) error_empty else null
+        lastNameError = if (lastNamefield.isBlank()) error_empty else null
+        secondLastNameError = if (secondLastNameField.isBlank()) error_empty else null
 
         if (firstNameError == null && lastNameError == null && secondLastNameError == null) {
             firstName = firstNamefield
@@ -363,33 +379,33 @@ fun StepPersonalInfo(onNext: () -> Unit, onPrevious: () -> Unit) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
         CustomOutlinedTextFieldWithValidation(
-            label = "Nombre",
+            label = stringResource(R.string.first_name_label),
             value = firstNamefield,
             onValueChange = { firstNamefield = it },
             shape = RoundedCornerShape(30.dp),
-            validation = { if (it.isBlank()) "Este campo no puede estar vacío" else null }
+            validation = { if (it.isBlank()) error_empty else null }
         )
         if (firstNameError != null) {
             Text(text = firstNameError!!, color = Color.Red, fontSize = 12.sp)
         }
 
         CustomOutlinedTextFieldWithValidation(
-            label = "Primer Apellido",
+            label = stringResource(R.string.last_name_label),
             value = lastNamefield,
             onValueChange = { lastNamefield = it },
             shape = RoundedCornerShape(30.dp),
-            validation = { if (it.isBlank()) "Este campo no puede estar vacío" else null }
+            validation = { if (it.isBlank()) error_empty else null }
         )
         if (lastNameError != null) {
             Text(text = lastNameError!!, color = Color.Red, fontSize = 12.sp)
         }
 
         CustomOutlinedTextFieldWithValidation(
-            label = "Segundo Apellido",
+            label = stringResource(R.string.second_last_name_label),
             value = secondLastNameField,
             onValueChange = { secondLastNameField = it },
             shape = RoundedCornerShape(30.dp),
-            validation = { if (it.isBlank()) "Este campo no puede estar vacío" else null }
+            validation = { if (it.isBlank()) error_empty else null }
         )
         if (secondLastNameError != null) {
             Text(text = secondLastNameError!!, color = Color.Red, fontSize = 12.sp)
@@ -413,11 +429,16 @@ fun StepWeightGoals(onNext: () -> Unit, onPrevious: () -> Unit) {
     var heightError by remember { mutableStateOf<String?>(null) }
     var ageError by remember { mutableStateOf<String?>(null) }
 
+    val error_empty = stringResource(R.string.error_empty)
+    val invalid_weight = stringResource(R.string.invalid_weight)
+    val invalid_height = stringResource(R.string.invalid_height)
+    val invalid_age = stringResource(R.string.invalid_age)
+
     val validateForm = {
-        currentWeightError = validateWeight(currentWeightField) ?: if (currentWeightField.isBlank()) "Este campo no puede estar vacío" else null
-        targetWeightError = validateWeight(targetWeightField) ?: if (targetWeightField.isBlank()) "Este campo no puede estar vacío" else null
-        heightError = validateHeight(heightField) ?: if (heightField.isBlank()) "Este campo no puede estar vacío" else null
-        ageError = validateAge(ageField) ?: if (ageField.isBlank()) "Este campo no puede estar vacío" else null
+        currentWeightError = validateWeight(currentWeightField, invalid_weight) ?: if (currentWeightField.isBlank()) error_empty else null
+        targetWeightError = validateWeight(targetWeightField, invalid_weight) ?: if (targetWeightField.isBlank()) error_empty else null
+        heightError = validateHeight(heightField, invalid_height) ?: if (heightField.isBlank()) error_empty else null
+        ageError = validateAge(ageField, invalid_age) ?: if (ageField.isBlank()) error_empty else null
 
         if (currentWeightError == null && targetWeightError == null && heightError == null && ageError == null) {
             currentWeight = currentWeightField
@@ -430,48 +451,48 @@ fun StepWeightGoals(onNext: () -> Unit, onPrevious: () -> Unit) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
         CustomOutlinedTextFieldWithValidation(
-            label = "Peso Actual (kg)",
+            label = stringResource(R.string.current_weight_label),
             value = currentWeightField,
             onValueChange = { currentWeightField = it },
             keyboardType = KeyboardType.Number,
             shape = RoundedCornerShape(30.dp),
-            validation = { currentWeightError = validateWeight(it) ?: if (it.isBlank()) "Este campo no puede estar vacío" else null; currentWeightError }
+            validation = { currentWeightError = validateWeight(it, invalid_weight) ?: if (it.isBlank()) error_empty else null; currentWeightError }
         )
         if (currentWeightError != null) {
             Text(text = currentWeightError!!, color = Color.Red, fontSize = 12.sp)
         }
 
         CustomOutlinedTextFieldWithValidation(
-            label = "Objetivo de Peso (kg)",
+            label = stringResource(R.string.target_weight_label),
             value = targetWeightField,
             onValueChange = { targetWeightField = it },
             keyboardType = KeyboardType.Number,
             shape = RoundedCornerShape(30.dp),
-            validation = { targetWeightError = validateWeight(it) ?: if (it.isBlank()) "Este campo no puede estar vacío" else null; targetWeightError }
+            validation = { targetWeightError = validateWeight(it, invalid_weight) ?: if (it.isBlank()) error_empty else null; targetWeightError }
         )
         if (targetWeightError != null) {
             Text(text = targetWeightError!!, color = Color.Red, fontSize = 12.sp)
         }
 
         CustomOutlinedTextFieldWithValidation(
-            label = "Altura (cm)",
+            label = stringResource(R.string.height_label),
             value = heightField,
             onValueChange = { heightField = it },
             keyboardType = KeyboardType.Number,
             shape = RoundedCornerShape(30.dp),
-            validation = { heightError = validateHeight(it) ?: if (it.isBlank()) "Este campo no puede estar vacío" else null; heightError }
+            validation = { heightError = validateHeight(it, invalid_height) ?: if (it.isBlank()) error_empty else null; heightError }
         )
         if (heightError != null) {
             Text(text = heightError!!, color = Color.Red, fontSize = 12.sp)
         }
 
         CustomOutlinedTextFieldWithValidation(
-            label = "Edad",
+            label = stringResource(R.string.age_label),
             value = ageField,
             onValueChange = { ageField = it },
             keyboardType = KeyboardType.Number,
             shape = RoundedCornerShape(30.dp),
-            validation = { ageError = validateAge(it) ?: if (it.isBlank()) "Este campo no puede estar vacío" else null; ageError }
+            validation = { ageError = validateAge(it, invalid_age) ?: if (it.isBlank()) error_empty else null; ageError }
         )
         if (ageError != null) {
             Text(text = ageError!!, color = Color.Red, fontSize = 12.sp)
@@ -488,11 +509,12 @@ fun StepWeightGoals(onNext: () -> Unit, onPrevious: () -> Unit) {
 fun StepActivityInfo(onNext: () -> Unit, onPrevious: () -> Unit) {
     var selectedGender by remember { mutableStateOf("") }
     var expandedGender by remember { mutableStateOf(false) }
-    val genderOptions = listOf("Hombre", "Mujer", "Otro")
+    val genderOptions = listOf(stringResource(R.string.gender_options_male), stringResource(R.string.gender_options_female), stringResource(R.string.gender_options_other))
 
     var selectedActivityLevel by remember { mutableStateOf("") }
     var expandedActivityLevel by remember { mutableStateOf(false) }
-    val activityLevelOptions = listOf("Sedentario", "Ligera", "Moderada", "Alta")
+    val activityLevelOptions = listOf(stringResource(R.string.activity_level_sedentary), stringResource(R.string.activity_level_light), stringResource(R.string.activity_level_moderate), stringResource(R.string.activity_level_high))
+
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
 
@@ -509,7 +531,7 @@ fun StepActivityInfo(onNext: () -> Unit, onPrevious: () -> Unit) {
                 .padding(16.dp)
         ) {
             Text(
-                text = if (selectedGender.isEmpty()) "Seleccione género" else selectedGender,
+                text = if (selectedGender.isEmpty()) stringResource(R.string.gender_select) else selectedGender,
                 color = if (selectedGender.isEmpty()) Color.Gray else Color.Black,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Start // Alineación a la izquierda
@@ -546,7 +568,7 @@ fun StepActivityInfo(onNext: () -> Unit, onPrevious: () -> Unit) {
                 .padding(16.dp)
         ){
             Text(
-                text = if (selectedActivityLevel.isEmpty()) "Seleccione nivel de actividad" else selectedActivityLevel,
+                text = if (selectedActivityLevel.isEmpty()) stringResource(R.string.activity_level_label) else selectedActivityLevel,
                 color = if (selectedGender.isEmpty()) Color.Gray else Color.Black,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Start
@@ -575,7 +597,7 @@ fun StepActivityInfo(onNext: () -> Unit, onPrevious: () -> Unit) {
 @Composable
 fun StepConfirmation(navController: NavController, onPrevious: () -> Unit, onFinalizar: () -> Unit) {
     LocalImageExample()
-    Text("¡Registro completo!", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+    Text(stringResource(R.string.step_confirmation), fontSize = 24.sp, fontWeight = FontWeight.Bold)
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -587,7 +609,7 @@ fun StepConfirmation(navController: NavController, onPrevious: () -> Unit, onFin
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp) // Espaciado lateral
         ) {
             CustomButton(
-                text = "Anterior",
+                text = stringResource(R.string.previous_button_text),
                 onClick = onPrevious,
                 padding = PaddingValues(10.dp),
                 fontWeight = FontWeight.SemiBold,
@@ -596,7 +618,7 @@ fun StepConfirmation(navController: NavController, onPrevious: () -> Unit, onFin
             )
 
             CustomButton(
-                text = "Finalizar",
+                text = stringResource(R.string.finish_button_text),
                 onClick = onFinalizar,
                 padding = PaddingValues(10.dp),
                 fontWeight = FontWeight.SemiBold,
@@ -670,7 +692,7 @@ fun StepNavigationButtons(onNext: () -> Unit, onPrevious: () -> Unit) {
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp) // Espaciado lateral
         ) {
             CustomButton(
-                text = "Anterior",
+                text = stringResource(R.string.previous_button_text),
                 onClick = onPrevious,
                 padding = PaddingValues(10.dp),
                 fontWeight = FontWeight.SemiBold,
@@ -679,7 +701,7 @@ fun StepNavigationButtons(onNext: () -> Unit, onPrevious: () -> Unit) {
             )
 
             CustomButton(
-                text = "Siguiente",
+                text = stringResource(R.string.next_button_text),
                 onClick = onNext,
                 padding = PaddingValues(10.dp),
                 fontWeight = FontWeight.SemiBold,

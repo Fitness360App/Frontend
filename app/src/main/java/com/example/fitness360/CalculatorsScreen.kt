@@ -19,6 +19,7 @@ import com.example.fitness360.network.ApiClient
 import com.example.fitness360.network.UserData
 import com.example.fitness360.network.UserService
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.example.fitness360.network.CalculatorService
 import com.example.fitness360.utils.StepCounterViewModel
 import com.example.fitness360.utils.getUserUid
@@ -73,13 +74,13 @@ fun CalculatorsScreen(navController: NavController, viewModel: StepCounterViewMo
             // Encabezado con padding superior ajustado
             Column(modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)) {
                 Text(
-                    text = "CALCULADORA",
+                    text = stringResource(R.string.calculator_title),
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF333333)
                 )
                 Text(
-                    text = "MACRONUTRIENTES",
+                    text = stringResource(R.string.macronutrients_subtitle),
                     fontSize = 22.sp,
                     color = Color(0xFF007ACC),
                     fontWeight = FontWeight.SemiBold
@@ -90,29 +91,29 @@ fun CalculatorsScreen(navController: NavController, viewModel: StepCounterViewMo
             userData?.let { user ->
                 // Llenar los campos con los datos del usuario
                 val userInfo = listOf(
-                    "Altura" to "${user.height} cm",
-                    "Peso" to "${user.actualWeight} kg",
-                    "Edad" to "${user.age} años",
-                    "Objetivo" to if (user.goalWeight > user.actualWeight) "Ganar Peso" else "Perder Peso"
+                    stringResource(R.string.height) to "${user.height} cm",
+                    stringResource(R.string.weight_label) to "${user.actualWeight} kg",
+                    stringResource(R.string.age_label) to user.age.toString() + stringResource(R.string.years_old),
+                    stringResource(R.string.goal_label) to if (user.goalWeight > user.actualWeight) stringResource(R.string.gain_weight) else stringResource(R.string.lose_weight)
                 )
 
                 InfoCard(
-                    title = "Sus datos introducidos son",
+                    title = stringResource(R.string.user_data_title),
                     items = userInfo
                 )
 
                 Spacer(modifier = Modifier.height(16.dp)) // Espacio uniforme
 
                 val macroInfo = listOf(
-                    "Kilocalorías" to "${user.kcals} kcals",
-                    "Proteínas" to "${user.proteins} g",
-                    "Grasas" to "${user.fats} g",
-                    "Carbohidratos" to "${user.carbs} g",
-                    "IMC" to (imc ?: "Cargando...")
+                    stringResource(R.string.calories_label) to "${user.kcals} kcals",
+                    stringResource(R.string.proteins_label) to "${user.proteins} g",
+                    stringResource(R.string.fats_label) to "${user.fats} g",
+                    stringResource(R.string.carbs_label) to "${user.carbs} g",
+                    stringResource(R.string.bmi_label) to (imc ?: stringResource(R.string.loading))
                 )
 
                 InfoCard(
-                    title = "Sus macros son:",
+                    title = stringResource(R.string.macros_title),
                     items = macroInfo
                 )
             }

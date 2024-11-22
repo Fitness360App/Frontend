@@ -207,7 +207,7 @@ fun MealList(mealName: String, foods: List<FoodItem>, onFoodClick: (FoodItem) ->
                 contentAlignment = Alignment.Center // Centrar el texto
             ) {
                 Text(
-                    text = "( No se ha consumido ningún alimento )",
+                    text = stringResource(R.string.no_meals_added),
                     fontSize = 14.sp,
                     color = Color.Gray, // Color gris para dar énfasis
                     fontWeight = FontWeight.SemiBold

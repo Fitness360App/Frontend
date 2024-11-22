@@ -132,23 +132,23 @@ fun RegisterScreen(navController: NavController) {
                                 if (registerResponse != null) {
                                     saveUserUid(context, registerResponse.uid)
                                     // Llamada al servicio de registro para crearlo
-                                    val dailyRecodService = ApiClient.retrofit.create(DailyRecordService::class.java)
+                                    //val dailyRecodService = ApiClient.retrofit.create(DailyRecordService::class.java)
 
                                     // Crear el servicio de DailyRecord
-                                    val dailyRecordService = ApiClient.retrofit.create(DailyRecordService::class.java)
+                                    //val dailyRecordService = ApiClient.retrofit.create(DailyRecordService::class.java)
 
                                     // Obtener la fecha actual en formato `dd/MM/yyyy`
-                                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                                    val currentDate = dateFormat.format(Date())
+                                    //val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                    //val currentDate = dateFormat.format(Date())
 
                                     // Crear la solicitud para DailyRecord con el UID y la fecha actual
-                                    val dailyRecordRequest = DailyRecordRequest(uid = registerResponse.uid, date = currentDate)
+                                    //val dailyRecordRequest = DailyRecordRequest(uid = registerResponse.uid, date = currentDate)
 
-                                    println(dailyRecordRequest)
+                                    //println(dailyRecordRequest)
                                     // Llamada a la API para crear el DailyRecord
                                     CoroutineScope(Dispatchers.IO).launch {
                                         try {
-                                            val response = dailyRecordService.createDailyRecord(dailyRecordRequest)
+                                            //val response = dailyRecordService.createDailyRecord(dailyRecordRequest)
 
                                             withContext(Dispatchers.Main) {
                                                 if (response.isSuccessful) {

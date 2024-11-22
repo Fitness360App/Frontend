@@ -239,15 +239,15 @@ fun ForgotPasswordScreen(navController: NavController) {
 
                                         if (response.isSuccessful) {
 
-                                            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                                            val currentDate = dateFormat.format(Date())
+                                            //val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                            //val currentDate = dateFormat.format(Date())
 
                                             // Instancia del servicio DailyRecordService
-                                            val dailyRecordService = ApiClient.retrofit.create(DailyRecordService::class.java)
+                                            //val dailyRecordService = ApiClient.retrofit.create(DailyRecordService::class.java)
 
                                             CoroutineScope(Dispatchers.IO).launch {
                                                 // Comprobar si existe el dailyRecord
-                                                val checkResponse = uid?.let {
+                                                /*val checkResponse = uid?.let {
                                                     dailyRecordService.getDailyRecord(
                                                         it, currentDate)
                                                 }
@@ -264,7 +264,7 @@ fun ForgotPasswordScreen(navController: NavController) {
                                                             dailyRecordService.createDailyRecord(dailyRecordRequest)
                                                         }
                                                     }
-                                                }
+                                                }*/
 
                                                 // Navegar a Home después de la verificación/creación del registro diario
                                                 withContext(Dispatchers.Main) {

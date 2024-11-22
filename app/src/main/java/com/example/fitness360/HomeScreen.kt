@@ -6,6 +6,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -51,6 +54,7 @@ import com.example.fitness360.network.UserData
 import com.example.fitness360.utils.getUserUid
 
 import com.example.fitness360.components.BottomNavigationBar
+import com.example.fitness360.components.ProductCard
 import com.example.fitness360.network.ApiClient
 
 import com.example.fitness360.network.UserDataRequest
@@ -77,6 +81,10 @@ fun HomeScreen(navController: NavController, viewModel: StepCounterViewModel) {
 
     var userData by remember { mutableStateOf<UserData?>(null) }
     var dailyRecord by remember { mutableStateOf<DailyRecord?>(null) }
+
+    var ranking by remember { mutableStateOf(listOf<Pair<String, Int>>()) }
+
+
     val loadingMessage =  stringResource(R.string.loading)
     val loadedMessage =  stringResource(R.string.loaded_user_data)
     val errorloadingMessage =  stringResource(R.string.error_user_data)
@@ -98,7 +106,6 @@ fun HomeScreen(navController: NavController, viewModel: StepCounterViewModel) {
                     val userResponse = userService.getUserDataByID(it)
                     if (userResponse.isSuccessful) {
                         userData = userResponse.body()
-                        println(userData)
                         loadStatus = loadedMessage
                     } else {
                         loadStatus = errorloadingMessage
@@ -112,6 +119,18 @@ fun HomeScreen(navController: NavController, viewModel: StepCounterViewModel) {
                     } else {
                         loadStatus = error_daily_record
                     }
+
+                    // Cargar ranking de los 3 usuarios con más pasos
+                    val rankingResponse = dailyRecordService.getBestSteps(currentDate)
+
+                    println(rankingResponse.body())
+                    if (rankingResponse.isSuccessful) {
+                        ranking = rankingResponse.body()?.map { record ->
+                            record.name to record.steps
+                        } ?: emptyList()
+                    }
+
+
                 } catch (e: Exception) {
                     loadStatus = error_network + e.message
                 }
@@ -127,60 +146,76 @@ fun HomeScreen(navController: NavController, viewModel: StepCounterViewModel) {
             .fillMaxSize()
             .padding(start = 16.dp, top = 16.dp, end = 16.dp)
     ) {
-        Column(
+        LazyColumn(
             modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.Start
+                .fillMaxSize()
+                .padding(bottom = 56.dp) // Espacio para el BottomNavigationBar
         ) {
-            // Encabezado
-            Column(
-                modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.hello),
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                Text(
-                    text = userData?.name?.lowercase()?.replaceFirstChar { it.uppercase() } ?: loadingMessage,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF0066A1)
-                )
+            item {
+                Column(
+                    modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.hello),
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Text(
+                        text = userData?.name?.lowercase()?.replaceFirstChar { it.uppercase() }
+                            ?: loadingMessage,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF0066A1)
+                    )
+                }
             }
 
             // Verificar si los datos están disponibles antes de renderizar los indicadores
-            userData?.let { user ->
+            item {
+                userData?.let { user ->
+                    dailyRecord?.let { record ->
+                        MultiLayerCircularIndicators(
+                            carbProgress = 0.5f,
+                            proteinProgress = 0.2f,
+                            fatProgress = 0.3f,
+                            kcalsProgress = 0.5f,
+                            userData = user,
+                            dailyRecord = record
+                        )
+                    }
+                }
+            }
+
+
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
                 dailyRecord?.let { record ->
-                    MultiLayerCircularIndicators(
-                        carbProgress = 0.5f,
-                        proteinProgress = 0.2f,
-                        fatProgress = 0.3f,
-                        kcalsProgress = 0.5f,
-                        userData = user,
-                        dailyRecord = record
-                    )
+                    userData?.kcals?.let {
+                        ActivitySummary(
+                            steps = record.steps.toInt(),
+                            burnedKcals = record.burnedKcals.toInt(),
+                            consumedKcals = record.nutrients.consumedKcals.toInt(),
+                            totalKcals = it.toInt()
+                        )
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Mostrar resumen de actividad si dailyRecord tiene datos
-            dailyRecord?.let { record ->
-                userData?.kcals?.let {
-                    ActivitySummary(
-                        steps = record.steps.toInt(),
-                        burnedKcals = record.burnedKcals.toInt(),
-                        consumedKcals = record.nutrients.consumedKcals.toInt(),
-                        totalKcals = it.toInt()
-                    )
-                }
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                StepsRanking(ranking = ranking)
+                Spacer(modifier = Modifier.height(24.dp))
             }
+
         }
 
-        // Barra de navegación
-        BottomNavigationBar(navController = navController)
+        Box(
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
+            BottomNavigationBar(navController = navController)
+        }
+
     }
 }
 
@@ -494,6 +529,109 @@ fun ActivitySummaryItem(icon: ImageVector, value: String, label: String) {
         }
     }
 }
+
+
+
+@Composable
+fun StepsRanking(ranking: List<Pair<String, Int>>) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(300.dp), // Ajusta la altura según lo necesites
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent // Fondo transparente para aplicar el degradado
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        shape = RoundedCornerShape(40.dp) // Bordes redondeados
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xFF0066A1), // Color inicial
+                            Color(0xFF0096D1)  // Color final
+                        ),
+                        start = Offset(0f, 0f),
+                        end = Offset(0f, Float.POSITIVE_INFINITY) // Degradado vertical
+                    )
+                )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Título del ranking
+                Text(
+                    text = "Steps Ranking",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Lista de usuarios con sus posiciones
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    itemsIndexed(ranking) { index, user ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp)
+                        ) {
+                            // Icono de medalla según el puesto
+                            Icon(
+                                imageVector = when (index) {
+                                    0 -> Icons.Default.Star // Estrella para el primer lugar
+                                    1 -> Icons.Default.EmojiEvents // Trofeo para el segundo lugar
+                                    else -> Icons.Default.MilitaryTech // Medalla para el tercer lugar
+                                },
+                                contentDescription = null,
+                                tint = when (index) {
+                                    0 -> Color(0xFFFFD700) // Oro
+                                    1 -> Color(0xFFC0C0C0) // Plata
+                                    else -> Color(0xFFCD7F32) // Bronce
+                                },
+                                modifier = Modifier.size(36.dp)
+                            )
+
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            // Nombre y pasos del usuario
+                            Column(
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = user.first, // Nombre del usuario
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                                Text(
+                                    text = "${user.second} ${stringResource(R.string.steps_label)}", // Pasos
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Light,
+                                    color = Color.White
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 
 
 

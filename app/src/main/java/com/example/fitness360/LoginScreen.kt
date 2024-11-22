@@ -163,15 +163,15 @@ fun LoginScreen(navController: NavController) {
 
                                     CoroutineScope(Dispatchers.IO).launch {
                                         // Comprobar si existe el dailyRecord
-                                        val checkResponse = dailyRecordService.getDailyRecord(loginResponse.uid, currentDate)
-                                        if (!checkResponse.isSuccessful) {
+                                        //val checkResponse = dailyRecordService.getDailyRecord(loginResponse.uid, currentDate)
+                                        /*if (!checkResponse.isSuccessful) {
                                             // Si no existe, crearlo
-                                            val dailyRecordRequest = DailyRecordRequest(
+                                           /* val dailyRecordRequest = DailyRecordRequest(
                                                 uid = loginResponse.uid,
                                                 date = currentDate
-                                            )
-                                            dailyRecordService.createDailyRecord(dailyRecordRequest)
-                                        }
+                                            )*/
+                                            //dailyRecordService.createDailyRecord(dailyRecordRequest)
+                                        }*/
 
                                         // Navegar a Home después de la verificación/creación del registro diario
                                         withContext(Dispatchers.Main) {

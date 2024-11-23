@@ -258,7 +258,7 @@ fun BMIRangesExpandableCard() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Clasificación de BMI",
+                    text = stringResource(R.string.bmi_qualification),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF333333)
@@ -275,7 +275,7 @@ fun BMIRangesExpandableCard() {
             // Subtítulo breve
             if (!isExpanded) {
                 Text(
-                    text = "Conoce los rangos de BMI y lo que significan.",
+                    text = stringResource(R.string.about_bmi),
                     fontSize = 14.sp,
                     color = Color(0xFF666666),
                     lineHeight = 20.sp
@@ -287,10 +287,10 @@ fun BMIRangesExpandableCard() {
             // Contenido expandido
             if (isExpanded) {
                 val bmiRanges = listOf(
-                    "Bajo peso (<18.5)" to Color(0xFF4A90E2),
-                    "Peso normal (18.5–24.9)" to Color(0xFF50E3C2),
-                    "Sobrepeso (25–29.9)" to Color(0xFFFFC107),
-                    "Obesidad (≥30)" to Color(0xFFE94C4C)
+                    stringResource(R.string.bmi_underweight) to Color(0xFF4A90E2),
+                    stringResource(R.string.bmi_normal) to Color(0xFF50E3C2),
+                    stringResource(R.string.bmi_overweight) to Color(0xFFFFC107),
+                    stringResource(R.string.bmi_obese) to Color(0xFFE94C4C)
                 )
 
                 bmiRanges.forEach { (range, color) ->
@@ -320,11 +320,6 @@ fun BMIRangesExpandableCard() {
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = Color(0xFF333333)
-                            )
-                            Text(
-                                text = "Descripción breve del rango.",
-                                fontSize = 12.sp,
-                                color = Color(0xFF666666)
                             )
                         }
                     }

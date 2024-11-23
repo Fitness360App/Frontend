@@ -137,6 +137,12 @@
     <string name="fats_label">Fats</string>
     <string name="carbs_label">Carbs</string>
     <string name="bmi_label">BMI</string>
+    <string name="bmi_qualification">BMI Qualification</string>
+    <string name="about_bmi">Get to know the BMI ranges and what they mean</string>
+    <string name="bmi_underweight">Underweight (&lt;18.5)</string>
+    <string name="bmi_normal">Normal Weight (18.5-24.9)</string>
+    <string name="bmi_overweight">Overweight (25-29.9)</string>
+    <string name="bmi_obese">Obese (&gt;30)</string>
 
     <!-- MealScreen Strings -->
     <string name="meal_title">MEALS</string>

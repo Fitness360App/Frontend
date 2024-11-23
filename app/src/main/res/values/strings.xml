@@ -41,7 +41,7 @@
     <string name="gender_options_male">Hombre</string>
     <string name="gender_options_female">Mujer</string>
     <string name="gender_options_other">Otro</string>
-    <string name="activity_level_label">Seleccione Nivel de Actividad</string>
+    <string name="activity_level_label">Nivel de Actividad</string>
     <string name="activity_level_sedentary">Sedentario</string>
     <string name="activity_level_light">Ligera</string>
     <string name="activity_level_moderate">Moderada</string>
@@ -102,6 +102,7 @@
     <string name="carbs">Carbohidratos</string>
     <string name="proteins">Proteínas</string>
     <string name="fats">Grasas</string>
+    <string name="steps_ranking">Ranking de Pasos</string>
 
     <!-- SearchFood y camara Strings -->
     <string name="search_product">Buscar Producto</string>

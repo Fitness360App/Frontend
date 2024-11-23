@@ -41,7 +41,7 @@
     <string name="gender_options_male">Male</string>
     <string name="gender_options_female">Female</string>
     <string name="gender_options_other">Other</string>
-    <string name="activity_level_label">Select your Activity Level</string>
+    <string name="activity_level_label">Activity Level</string>
     <string name="activity_level_sedentary">Sedentary</string>
     <string name="activity_level_light">Light</string>
     <string name="activity_level_moderate">Moderate</string>
@@ -102,6 +102,7 @@
     <string name="carbs">Carbs</string>
     <string name="proteins">Proteins</string>
     <string name="fats">Fats</string>
+    <string name="steps_ranking">Steps Ranking</string>
 
     <!-- SearchFood and Camera Strings -->
     <string name="search_product">Search Product</string>

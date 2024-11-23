@@ -67,10 +67,10 @@ fun MealScreen(navController: NavController, viewModel: StepCounterViewModel) {
         uid?.let { userId ->
             // Lista de pares de tipo de comida y su lista correspondiente
             val mealTypes = listOf(
-                desayunoLabel to desayuno,
-                almuerzoLabel to almuerzo,
-                meriendaLabel to merienda,
-                cenaLabel to cena
+                "breakfast" to desayuno,
+                "lunch" to almuerzo,
+                "snack" to merienda,
+                "dinner" to cena
             )
 
             // Iterar sobre cada par y cargar los alimentos
@@ -130,10 +130,10 @@ fun MealScreen(navController: NavController, viewModel: StepCounterViewModel) {
         selectedFood?.let { food ->
             if (uid != null) {
                 val mealType = when {
-                    desayuno.contains(food) -> stringResource(R.string.breakfast)
-                    almuerzo.contains(food) -> stringResource(R.string.lunch)
-                    merienda.contains(food) -> stringResource(R.string.snack)
-                    cena.contains(food) -> stringResource(R.string.dinner)
+                    desayuno.contains(food) -> "breakfast"
+                    almuerzo.contains(food) -> "lunch"
+                    merienda.contains(food) -> "snack"
+                    cena.contains(food) -> "dinner"
                     else -> ""
                 }
 

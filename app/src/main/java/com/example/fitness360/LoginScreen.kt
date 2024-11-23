@@ -20,7 +20,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -68,6 +67,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.ui.text.TextStyle // Asegúrate de importar esta clase
+import androidx.compose.ui.graphics.Color // Asegúrate de importar la clase Color
 
 
 @Composable
@@ -114,7 +115,9 @@ fun LoginScreen(navController: NavController) {
                 label = { Text(stringResource(R.string.email)) },
                 modifier = Modifier
                     .fillMaxWidth(),
-                shape = RoundedCornerShape(30.dp)
+                shape = RoundedCornerShape(30.dp),
+                textStyle = TextStyle(color = Color.Black)
+
             )
 
             OutlinedTextField(
@@ -125,7 +128,8 @@ fun LoginScreen(navController: NavController) {
                     .fillMaxWidth()
                     .padding(top = 8.dp),
                 shape = RoundedCornerShape(30.dp),
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = PasswordVisualTransformation(),
+                textStyle = TextStyle(color = Color.Black)
             )
 
             Text(

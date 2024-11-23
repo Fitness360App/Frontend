@@ -322,7 +322,7 @@ fun MultiLayerCircularIndicators(
 
             // Texto de porcentaje en el centro
             Text(
-                text = "${((dailyRecord.nutrients.consumedKcals - dailyRecord.burnedKcals) / userData.kcals * 100).toInt()}%",
+                text = "${maxOf(0, ((dailyRecord.nutrients.consumedKcals - dailyRecord.burnedKcals) / userData.kcals * 100).toInt())}%",
                 color = Color.Black,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
@@ -567,7 +567,7 @@ fun StepsRanking(ranking: List<Pair<String, Int>>) {
             ) {
                 // Título del ranking
                 Text(
-                    text = "Steps Ranking",
+                    text = stringResource(R.string.steps_ranking),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -611,7 +611,7 @@ fun StepsRanking(ranking: List<Pair<String, Int>>) {
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 Text(
-                                    text = user.first, // Nombre del usuario
+                                    text = user.first.capitalize(), // Nombre del usuario
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White

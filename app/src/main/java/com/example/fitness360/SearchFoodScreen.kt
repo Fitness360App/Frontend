@@ -62,7 +62,8 @@ import java.util.concurrent.Executors
 fun SearchFoodScreen(
     navController: NavController,
     viewModel: StepCounterViewModel,
-    cameraExecutor: ExecutorService, ) {
+    cameraExecutor: ExecutorService,
+) {
     val steps by viewModel.steps.collectAsState()
     val foodService = ApiClient.retrofit.create(FoodService::class.java)
     var searchQuery by remember { mutableStateOf("") }
@@ -188,7 +189,7 @@ fun SearchFoodScreen(
                         isCameraOpen = false
                     }
                 )
-                if (!isCameraOpen){
+                if (!isCameraOpen) {
                     showBarcodeScanner = false
                     CoroutineScope(Dispatchers.IO).launch {
                         try {

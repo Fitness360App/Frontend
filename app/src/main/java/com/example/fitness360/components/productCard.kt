@@ -32,36 +32,12 @@ import com.example.fitness360.network.MealService
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.text.TextStyle
 
-
-
-@Composable
-fun FoodImage(foodImagePath: String) {
-    val context = LocalContext.current
-
-    // Obtén el recurso dinámicamente
-    val resourceId = context.resources.getIdentifier(
-        foodImagePath.removeSuffix(".jpg"), // Remover extensión si es necesario
-        "drawable",
-        context.packageName
-    )
-
-    // Asegúrate de manejar el caso cuando no exista la imagen
-    if (resourceId != 0) {
-        Image(
-            painter = painterResource(id = resourceId),
-            contentDescription = null,
-            modifier = Modifier
-        )
-    } /*else {
-        // Imagen de respaldo si no se encuentra el recurso
-        Image(
-            painter = painterResource(id = R.drawable.placeholder), // Usa una imagen genérica
-            contentDescription = "Imagen no disponible",
-            modifier = Modifier
-        )
-    }*/
-}
 
 @Composable
 fun ProductCard(food: Food, uid: String) {
@@ -211,13 +187,17 @@ fun AddToMealDialog(
     onDismiss: () -> Unit,
     onConfirm: (String, String) -> Unit
 ) {
-    val desayunoMessage = stringResource(R.string.breakfast)
-    val almuerzoMessage = stringResource(R.string.lunch)
-    val snackMessage = stringResource(R.string.snack)
-    val cenaMessage = stringResource(R.string.dinner)
-    var selectedMeal by remember { mutableStateOf(desayunoMessage) }
+
+    val mealTranslations = mapOf(
+        "Breakfast" to stringResource(R.string.breakfast),
+        "Lunch" to stringResource(R.string.lunch),
+        "Snack" to stringResource(R.string.snack),
+        "Dinner" to stringResource(R.string.dinner)
+    )
+
+    var selectedMeal by remember { mutableStateOf("Breakfast") }
     var quantity by remember { mutableStateOf("") }
-    val mealOptions = listOf(desayunoMessage, almuerzoMessage, snackMessage, cenaMessage)
+    //val mealOptions = listOf(desayunoMessage, almuerzoMessage, snackMessage, cenaMessage)
     var expanded by remember { mutableStateOf(false) }
     val mealService = ApiClient.retrofit.create(MealService::class.java)
 
@@ -253,17 +233,17 @@ fun AddToMealDialog(
                         .background(Color.LightGray, shape = RoundedCornerShape(4.dp))
                         .padding(12.dp)
                 ) {
-                    Text(selectedMeal)
+                    Text(text = mealTranslations[selectedMeal] ?: "")
                 }
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    mealOptions.forEach { meal ->
+                    mealTranslations.forEach { (key, value) ->
                         DropdownMenuItem(
-                            text = { Text(meal) },
+                            text = { Text(value) },
                             onClick = {
-                                selectedMeal = meal
+                                selectedMeal = key // Almacena la clave en inglés
                                 expanded = false
                             }
                         )
@@ -281,7 +261,8 @@ fun AddToMealDialog(
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF005A9E),
                         cursorColor = Color(0xFF005A9E)
-                    )
+                    ),
+                    textStyle = TextStyle(color = Color.Black)
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))

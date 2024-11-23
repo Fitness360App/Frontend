@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -59,7 +60,6 @@ fun SettingsScreen(navController: NavController, viewModel: StepCounterViewModel
     var height by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var activityLevel by remember { mutableStateOf("") }
-    var language by remember { mutableStateOf("Español (ES)") } // Se mantiene estático
 
     LaunchedEffect(uid) {
         uid?.let {
@@ -145,38 +145,41 @@ fun SettingsScreen(navController: NavController, viewModel: StepCounterViewModel
             SettingsOption(stringResource(R.string.actual_weight), "$currentWeight kg")
             SettingsOption(stringResource(R.string.step_weight_goals), "$targetWeight kg")
             SettingsOption(stringResource(R.string.height), "$height cm")
-            SettingsOption(stringResource(R.string.age_label), "$age años")
+            SettingsOption(stringResource(R.string.age_label), "$age ${stringResource(R.string.years_old)}")
             SettingsOption(stringResource(R.string.activity_level_label), activityLevel)
-            SettingsOption("Idioma", language)
 
             Spacer(modifier = Modifier.weight(1f)) // Espacio flexible para empujar los botones hacia abajo
 
+
             // Botones "Configurar Cuenta" y "Eliminar Cuenta"
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+                verticalArrangement = Arrangement.spacedBy(8.dp), // Espaciado entre botones
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = stringResource(R.string.settings_title),
                     fontSize = 18.sp,
                     color = Color(0xFF007ACC),
                     fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center, // Centra el texto horizontalmente
                     modifier = Modifier
+                        .fillMaxWidth() // Ocupa todo el ancho
                         .clickable { navController.navigate("AccountSettingsScreen") }
                         .background(Color(0xFFE3F2FD), shape = CircleShape)
-                        .padding(vertical = 8.dp, horizontal = 16.dp)
+                        .padding(vertical = 8.dp)
                 )
-
 
                 Text(
                     text = stringResource(R.string.logout),
                     fontSize = 18.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center, // Centra el texto horizontalmente
                     modifier = Modifier
+                        .fillMaxWidth() // Ocupa todo el ancho
                         .clickable {
                             clearUserUid(context)
                             navController.navigate("auth") {
@@ -186,10 +189,11 @@ fun SettingsScreen(navController: NavController, viewModel: StepCounterViewModel
                             }
                         }
                         .background(Color(0xFF007ACC), shape = CircleShape)
-                        .padding(vertical = 8.dp, horizontal = 16.dp)
+                        .padding(vertical = 8.dp)
                 )
-
             }
+
+
         }
 
         BottomNavigationBar(navController = navController)
@@ -203,7 +207,6 @@ fun SettingsScreen(navController: NavController, viewModel: StepCounterViewModel
                 height = height,
                 age = age,
                 activityLevel = activityLevel,
-                language = language,
                 onDismiss = { showEditDialog = false },
                 onSave = { newName, newLastName, newCurrentWeight, newTargetWeight, newHeight, newAge, newActivityLevel ->
 
@@ -301,7 +304,6 @@ fun EditProfileDialog(
     height: String,
     age: String,
     activityLevel: String,
-    language: String,
     onDismiss: () -> Unit,
     onSave: (String, String, String, String, String, String, String) -> Unit
 ) {
@@ -312,11 +314,9 @@ fun EditProfileDialog(
     var userHeight by remember { mutableStateOf(height) }
     var userAge by remember { mutableStateOf(age) }
     var activity by remember { mutableStateOf(activityLevel) }
-    var userLanguage by remember { mutableStateOf(language) }
 
     // Opciones para el nivel de actividad y el idioma
     val activityOptions = listOf(stringResource(R.string.activity_level_sedentary), stringResource(R.string.activity_level_light), stringResource(R.string.activity_level_moderate), stringResource(R.string.activity_level_high))
-    val languageOptions = listOf("Español (ES)", "Inglés (EN)")
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -388,14 +388,6 @@ fun EditProfileDialog(
                         )
                     }
 
-                    item {
-                        DropdownSelector(
-                            label = "Idioma",
-                            options = languageOptions,
-                            selectedOption = userLanguage,
-                            onOptionSelected = { userLanguage = it }
-                        )
-                    }
                 }
             }
         },

@@ -2,7 +2,12 @@ package com.example.fitness360
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -68,7 +73,9 @@ fun CalculatorsScreen(navController: NavController, viewModel: StepCounterViewMo
             .padding(start = 16.dp, top = 16.dp, end = 16.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()), // Habilitamos el desplazamiento
             horizontalAlignment = Alignment.Start
         ) {
             // Encabezado con padding superior ajustado
@@ -93,7 +100,7 @@ fun CalculatorsScreen(navController: NavController, viewModel: StepCounterViewMo
                 val userInfo = listOf(
                     stringResource(R.string.height) to "${user.height} cm",
                     stringResource(R.string.weight_label) to "${user.actualWeight} kg",
-                    stringResource(R.string.age_label) to user.age.toString() + stringResource(R.string.years_old),
+                    stringResource(R.string.age_label) to user.age.toString() + " " + stringResource(R.string.years_old),
                     stringResource(R.string.goal_label) to if (user.goalWeight > user.actualWeight) stringResource(R.string.gain_weight) else stringResource(R.string.lose_weight)
                 )
 
@@ -102,7 +109,7 @@ fun CalculatorsScreen(navController: NavController, viewModel: StepCounterViewMo
                     items = userInfo
                 )
 
-                Spacer(modifier = Modifier.height(16.dp)) // Espacio uniforme
+                Spacer(modifier = Modifier.height(8.dp)) // Espacio uniforme
 
                 val macroInfo = listOf(
                     stringResource(R.string.calories_label) to "${user.kcals} kcals",
@@ -116,7 +123,15 @@ fun CalculatorsScreen(navController: NavController, viewModel: StepCounterViewMo
                     title = stringResource(R.string.macros_title),
                     items = macroInfo
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                BMIRangesExpandableCard()
+
             }
+
+            Spacer(modifier = Modifier.height(56.dp))
+
         }
 
         // Barra de navegación en la parte inferior, fija
@@ -217,3 +232,108 @@ fun InfoCard(title: String, items: List<Pair<String, String>>) {
         }
     }
 }
+
+
+@Composable
+fun BMIRangesExpandableCard() {
+    var isExpanded by remember { mutableStateOf(false) } // Estado para controlar el despliegue
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .shadow(8.dp, shape = RoundedCornerShape(16.dp)),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            // Título y botón de expandir
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Clasificación de BMI",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF333333)
+                )
+                IconButton(onClick = { isExpanded = !isExpanded }) {
+                    Icon(
+                        imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = if (isExpanded) "Contraer" else "Expandir",
+                        tint = Color(0xFF007ACC)
+                    )
+                }
+            }
+
+            // Subtítulo breve
+            if (!isExpanded) {
+                Text(
+                    text = "Conoce los rangos de BMI y lo que significan.",
+                    fontSize = 14.sp,
+                    color = Color(0xFF666666),
+                    lineHeight = 20.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Contenido expandido
+            if (isExpanded) {
+                val bmiRanges = listOf(
+                    "Bajo peso (<18.5)" to Color(0xFF4A90E2),
+                    "Peso normal (18.5–24.9)" to Color(0xFF50E3C2),
+                    "Sobrepeso (25–29.9)" to Color(0xFFFFC107),
+                    "Obesidad (≥30)" to Color(0xFFE94C4C)
+                )
+
+                bmiRanges.forEach { (range, color) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Indicador de color
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(color, color.copy(alpha = 0.6f))
+                                    ),
+                                    shape = RoundedCornerShape(50)
+                                )
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        // Texto de rango
+                        Column {
+                            Text(
+                                text = range,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color(0xFF333333)
+                            )
+                            Text(
+                                text = "Descripción breve del rango.",
+                                fontSize = 12.sp,
+                                color = Color(0xFF666666)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+

@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -138,18 +139,23 @@ fun AccountSettingsScreen(navController: NavController, viewModel: StepCounterVi
         Spacer(modifier = Modifier.height(16.dp))
 
         // Botones
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp), // Espaciado entre botones
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
 
-            Text (
+            Text(
                 text = stringResource(R.string.confirm_new_password),
                 fontSize = 18.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center, // Centra el texto horizontalmente
                 modifier = Modifier
+                    .fillMaxWidth() // Ocupa todo el ancho
                     .clickable {
                         if (newPassword != confirmPassword) {
                             errorMessage = passwordDoNotMatchMessage
@@ -196,7 +202,9 @@ fun AccountSettingsScreen(navController: NavController, viewModel: StepCounterVi
                 fontSize = 18.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center, // Centra el texto horizontalmente
                 modifier = Modifier
+                    .fillMaxWidth() // Ocupa todo el ancho
                     .clickable { showDeleteDialog = true }
                     .background(Color(0xFFEF5350), shape = CircleShape)
                     .padding(vertical = 8.dp, horizontal = 16.dp)

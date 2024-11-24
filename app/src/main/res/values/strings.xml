@@ -137,6 +137,12 @@
     <string name="fats_label">Grasas</string>
     <string name="carbs_label">Carbohidratos</string>
     <string name="bmi_label">IMC</string>
+    <string name="bmi_qualification">Clasificación de IMC</string>
+    <string name="about_bmi">Conoce los rangos de BMI y lo que significan.</string>
+    <string name="bmi_underweight">Bajo Peso (&lt;18.5)</string>
+    <string name="bmi_normal">Peso Normal (18.5-24.9)</string>
+    <string name="bmi_overweight">Sobrepeso (25-29.9)</string>
+    <string name="bmi_obese">Obesidad (&gt;30)</string>
 
     <!-- MealScreen Strings -->
     <string name="meal_title">COMIDAS</string>

@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -112,20 +113,14 @@ fun AccountSettingsScreen(navController: NavController, viewModel: StepCounterVi
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo contraseña actual
-        /*OutlinedTextField(
-            value = currentPassword,
-            onValueChange = { currentPassword = it },
-            label = { Text("Contraseña Actual") },
-            modifier = Modifier.fillMaxWidth()
-        )*/
 
         // Campo nueva contraseña
         OutlinedTextField(
             value = newPassword,
             onValueChange = { newPassword = it },
             label = { Text(stringResource(R.string.new_password)) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(color = Color.Black)
         )
 
         // Campo confirmar nueva contraseña
@@ -133,7 +128,8 @@ fun AccountSettingsScreen(navController: NavController, viewModel: StepCounterVi
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
             label = { Text(stringResource(R.string.confirm_new_password)) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(color = Color.Black)
         )
 
         Spacer(modifier = Modifier.height(16.dp))

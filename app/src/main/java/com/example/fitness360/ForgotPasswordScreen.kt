@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -116,7 +117,8 @@ fun ForgotPasswordScreen(navController: NavController) {
             value = currentEmail,
             onValueChange = { currentEmail = it },
             label = { Text(stringResource(R.string.current_email)) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(color = Color.Black)
         )
         
         // Campo nueva contraseña
@@ -124,7 +126,8 @@ fun ForgotPasswordScreen(navController: NavController) {
             value = newPassword,
             onValueChange = { newPassword = it },
             label = { Text(stringResource(R.string.new_password)) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(color = Color.Black)
         )
 
         // Campo confirmar nueva contraseña
@@ -132,7 +135,8 @@ fun ForgotPasswordScreen(navController: NavController) {
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
             label = { Text(stringResource(R.string.confirm_new_password)) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(color = Color.Black)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -239,32 +243,7 @@ fun ForgotPasswordScreen(navController: NavController) {
 
                                         if (response.isSuccessful) {
 
-                                            //val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                                            //val currentDate = dateFormat.format(Date())
-
-                                            // Instancia del servicio DailyRecordService
-                                            //val dailyRecordService = ApiClient.retrofit.create(DailyRecordService::class.java)
-
                                             CoroutineScope(Dispatchers.IO).launch {
-                                                // Comprobar si existe el dailyRecord
-                                                /*val checkResponse = uid?.let {
-                                                    dailyRecordService.getDailyRecord(
-                                                        it, currentDate)
-                                                }
-                                                if (checkResponse != null) {
-                                                    if (!checkResponse.isSuccessful) {
-                                                        // Si no existe, crearlo
-                                                        val dailyRecordRequest = uid?.let {
-                                                            DailyRecordRequest(
-                                                                uid = it,
-                                                                date = currentDate
-                                                            )
-                                                        }
-                                                        if (dailyRecordRequest != null) {
-                                                            dailyRecordService.createDailyRecord(dailyRecordRequest)
-                                                        }
-                                                    }
-                                                }*/
 
                                                 // Navegar a Home después de la verificación/creación del registro diario
                                                 withContext(Dispatchers.Main) {
